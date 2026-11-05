@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Conectados</title>
+<meta name="description" content="Vídeo de abertura interativo do programa Gestão da Mudança na Prática.">
+<link rel="stylesheet" href="css/player.css">
+</head>
+<body>
+<main class="app">
+  <div class="palco" id="palco">
+    <canvas id="tela" aria-label="Vídeo de abertura Conectados" role="img"></canvas>
+
+    <div class="legenda" id="legenda" aria-live="polite"></div>
+    <div class="dica" id="dica" aria-live="polite"></div>
+
+    <!-- Tela inicial -->
+    <div class="capa" id="capa" role="button" tabindex="0" aria-label="Começar o vídeo">
+      <div class="capa-conteudo">
+        <p class="capa-sobre">Gestão da Mudança na Prática · Vídeo de abertura</p>
+        <h1 class="capa-titulo">CONECTADOS</h1>
+        <div class="capa-acender">
+          <span class="faisca" aria-hidden="true"></span>
+          <span>Toque para acender</span>
+        </div>
+        <p class="capa-detalhe"><span>2min56s</span><span id="status-voz">Carregando…</span><span>Som ligado recomendado</span></p>
+      </div>
+      <button type="button" class="capa-link" id="capa-personalizar">Personalizar fotos e nomes</button>
+      <span class="selo" id="selo-rascunho">Rascunho para revisão · requer aprovação antes do uso</span>
+    </div>
+
+    <!-- Final -->
+    <div class="fim" id="fim" hidden>
+      <button type="button" class="botao-grande" id="fim-repetir">Assistir de novo</button>
+      <button type="button" class="botao-texto" id="fim-personalizar">Personalizar fotos e nomes</button>
+    </div>
+
+    <!-- Controles -->
+    <div class="controles" id="controles">
+      <div class="barra" id="barra" role="slider" tabindex="0" aria-label="Linha do tempo" aria-valuemin="0" aria-valuemax="176" aria-valuenow="0">
+        <div class="barra-partes" id="barra-partes"></div>
+        <div class="barra-progresso" id="barra-progresso"></div>
+        <div class="barra-cabeca" id="barra-cabeca"></div>
+        <div class="barra-dica" id="barra-dica"></div>
+      </div>
+      <div class="linha-controles">
+        <div class="grupo">
+          <button type="button" class="icone" id="btn-voltar" title="Cena anterior ([)" aria-label="Cena anterior">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>
+          </button>
+          <button type="button" class="icone play" id="btn-play" aria-label="Reproduzir">
+            <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>
+            <svg class="i-pausa" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4.5h4.2v15H6zM13.8 4.5H18v15h-4.2z"/></svg>
+          </button>
+          <button type="button" class="icone" id="btn-avancar" title="Próxima cena (])" aria-label="Próxima cena">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg>
+          </button>
+          <span class="tempo" id="tempo">0:00 / 2:56</span>
+          <span class="cena-atual" id="cena-atual">C01 · A faísca</span>
+        </div>
+        <div class="grupo">
+          <button type="button" class="icone texto" id="btn-interativo" title="Modo interativo (I)" aria-label="Modo interativo" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zm7.07 2.93a1 1 0 0 1 0 1.41l-1.41 1.42a1 1 0 1 1-1.42-1.42l1.42-1.41a1 1 0 0 1 1.41 0zM4.93 4.93a1 1 0 0 1 1.41 0l1.42 1.41A1 1 0 1 1 6.34 7.76L4.93 6.34a1 1 0 0 1 0-1.41zM12 7a5 5 0 0 1 3 9v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-2a5 5 0 0 1 3-9zm-2 14h4v1h-4z"/></svg>
+            <span>Interativo</span>
+          </button>
+          <button type="button" class="icone texto" id="btn-legenda" title="Legendas (C)" aria-label="Legendas" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm2 8v2h6v-2zm8 0v2h6v-2zM5 9v2h3V9zm5 0v2h9V9z"/></svg>
+            <span>Legendas</span>
+          </button>
+          <button type="button" class="icone" id="btn-som" title="Som (M)" aria-label="Som" aria-pressed="true">
+            <svg class="i-som" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>
+            <svg class="i-mudo" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zm12.3.3 1.4-1.4L20 10.2l2.3-2.3 1.4 1.4-2.3 2.3 2.3 2.3-1.4 1.4-2.3-2.3-2.3 2.3-1.4-1.4 2.3-2.3z"/></svg>
+          </button>
+          <button type="button" class="icone texto" id="btn-personalizar" title="Personalizar (P)" aria-label="Personalizar fotos e nomes">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"/></svg>
+            <span>Personalizar</span>
+          </button>
+          <button type="button" class="icone" id="btn-tela" title="Tela cheia (F)" aria-label="Tela cheia">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Personalização -->
+    <aside class="painel" id="painel" hidden aria-label="Personalizar fotos e nomes">
+      <header class="painel-topo">
+        <h2>Personalizar</h2>
+        <button type="button" class="icone" id="painel-fechar" aria-label="Fechar painel">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4z"/></svg>
+        </button>
+      </header>
+      <p class="nota">O que você carregar aqui fica salvo só neste navegador. Para deixar fixo no projeto, coloque os arquivos em <code>fotos/</code> e <code>logos/</code> e preencha <code>js/config.js</code>.</p>
+      <p class="aviso" id="painel-aviso" role="status"></p>
+      <div id="painel-corpo"></div>
+    </aside>
+  </div>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/roteiro.js"></script>
+<script src="js/brasil.js"></script>
+<script src="audio/narracao/dados.js"></script>
+<script src="audio/narracao/audio.js"></script>
+<script src="js/mg.js"></script>
+<script src="js/cenas-base.js"></script>
+<script src="js/cenas-1.js"></script>
+<script src="js/cenas-2.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/player.js"></script>
+</body>
+</html>
