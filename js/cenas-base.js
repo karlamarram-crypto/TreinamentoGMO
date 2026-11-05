@@ -30,6 +30,10 @@
     }
   };
 
+  // Trechos em que a parte de baixo da tela já tem texto: a legenda sobe para o topo
+  CX.legendaNoTopo = T => (CX.T.legTopo || []).some(([a, b]) => T >= a && T <= b);
+  CX.topoLegenda = (a, b) => { CX.T.legTopo = (CX.T.legTopo || []).concat([[a, b]]); };
+
   // Registra um efeito sonoro no instante t (segundos do vídeo)
   CX.som = (t, nome, o = {}, dur) => CX.sons.push({ t, nome, o, dur });
 

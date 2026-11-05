@@ -124,12 +124,13 @@
     if (CX.player && CX.player.legendasNoQuadro) {
       const txt = CX.voz.legenda(T);
       if (txt) {
+        const y = CX.legendaNoTopo(T) ? 70 : 992;
         MG.fonte(ctx, 40, 500, 'texto');
         const w = Math.min(1500, ctx.measureText(txt).width);
         ctx.fillStyle = 'rgba(1,3,10,0.72)';
-        MG.retArred(ctx, 960 - w / 2 - 24, 958, w + 48, 66, 8);
+        MG.retArred(ctx, 960 - w / 2 - 24, y - 34, w + 48, 66, 8);
         ctx.fill();
-        MG.texto(ctx, txt, 960, 992, { tam: 40, peso: 500, cor: MG.cor.branco });
+        MG.texto(ctx, txt, 960, y, { tam: 40, peso: 500, cor: MG.cor.branco });
       }
     }
     // brilho do cursor nas cenas interativas
@@ -209,6 +210,7 @@
 
   /* ---------------- Loop ---------------- */
   let ultimoTexto = null;
+  let ultimoTopo = null;
   function quadro() {
     requestAnimationFrame(quadro);
     try {
@@ -248,6 +250,11 @@
       el.textContent = txt;
       el.classList.toggle('visivel', !!txt);
       ultimoTexto = txt;
+    }
+    const topo = CX.legendaNoTopo(T);
+    if (topo !== ultimoTopo) {
+      $('#legenda').classList.toggle('topo', topo);
+      ultimoTopo = topo;
     }
   }
   let ultimaDica = null;

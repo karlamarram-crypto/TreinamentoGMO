@@ -258,6 +258,7 @@
       CX.T.fotos0 = ini;
       CX.T.conecta = conecta;
       CX.T.c11cam = { recua };
+      CX.topoLegenda(recua + 0.3, 125.7);
     },
     sons() {
       c11.ordem.forEach((i, k) => CX.som(c11.tFoto[i], 'luzLiga', { vol: 0.3, zumbido: 0.15, tom: 1 + (k % 5) * 0.06 }));

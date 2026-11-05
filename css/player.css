@@ -86,7 +86,7 @@ button { cursor: pointer; }
 .legenda {
   position: absolute;
   left: 50%;
-  bottom: 9.5cqw;
+  bottom: 10.6cqw;
   transform: translateX(-50%);
   max-width: min(78%, 62ch);
   padding: 0.35em 0.8em;
@@ -101,14 +101,15 @@ button { cursor: pointer; }
   pointer-events: none;
 }
 .legenda.visivel { opacity: 1; }
-.palco.oculto .legenda { bottom: 4.2cqw; }
+.palco.oculto .legenda { bottom: 4.6cqw; }
+.palco .legenda.topo { top: 1.6cqw; bottom: auto; }
 
 /* ---------- Dica de interação ---------- */
 .dica {
   position: absolute;
-  top: 2.2cqw;
+  bottom: 1.3cqw;
   left: 50%;
-  transform: translate(-50%, -8px);
+  transform: translate(-50%, 8px);
   padding: 0.45em 1em 0.45em 2.1em;
   border-radius: 999px;
   border: 1px solid rgba(255, 178, 63, 0.5);
@@ -135,6 +136,7 @@ button { cursor: pointer; }
   animation: pulsar 1.4s ease-in-out infinite;
 }
 .dica.visivel { opacity: 1; transform: translate(-50%, 0); }
+.palco.ativo:not(.oculto) .dica { bottom: 7.4cqw; }
 @keyframes pulsar { 50% { transform: scale(0.6); opacity: 0.6; } }
 
 /* ---------- Capa ---------- */

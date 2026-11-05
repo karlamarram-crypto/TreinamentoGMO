@@ -664,6 +664,7 @@
       [1, 2, 3].forEach(k => v.push(CX.voz.frase('c04', k, 22 + k * 2.4) - 0.2));
       for (let i = 1; i < 4; i++) v[i] = clamp(v[i], v[i - 1] + 1.6, 30.2);
       c04 = { v, solar: v[3] + (32 - v[3]) * 0.52 };
+      CX.topoLegenda(22.0, 31.4);
     },
     sons() {
       const v = c04.v;
@@ -1218,6 +1219,7 @@
       ordem.forEach((i, k) => { desliga[i] = k < nApaga ? v5 + 0.35 + (k / nApaga) * 3.0 : 999; });
       c07 = { v: [v1, v2, v3, v4, v5], desliga, ordem, nApaga, entregue: CX.voz.frase('c07', 5, 64.5) };
       CX.T.c07ultimo = ultimo;
+      CX.topoLegenda(v5, 69.6);
     },
     sons() {
       const v = c07.v;
@@ -1626,6 +1628,7 @@
       c08 = { v: [w1, w2, w3, w4, w5], liga, palavras: ['explica', 'escuta', 'envolve'].map((p, i) => CX.voz.palavra('c08', p, 72.6 + i * 0.9)) };
       CX.T.c08ini = w1 + 0.4;
       CX.T.c08mapa = w5;
+      CX.topoLegenda(w5 + 0.6, 88);
     },
     sons() {
       const v = c08.v;
