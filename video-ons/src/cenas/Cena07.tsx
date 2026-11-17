@@ -32,10 +32,10 @@ export const Cena07: React.FC = () => {
         fim={16}
         veu={0.58}
       />
-      {/* a rede recua */}
+      {/* o bloco de nomes recua */}
       {recua < 1 && (
         <div style={{position: 'absolute', inset: 0, opacity: 1 - recua, transform: `scale(${1 - 0.35 * recua})`, transformOrigin: '960px 470px'}}>
-          <Nomes t={99} L={nomes.L} tNomes={nomes.tNomes} tJunta={0} estatico />
+          <Nomes t={99} L={nomes.L} tNomes={nomes.tNomes} estatico />
         </div>
       )}
       <Svg>

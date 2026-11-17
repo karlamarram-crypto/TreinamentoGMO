@@ -1,17 +1,19 @@
 import React from 'react';
-import {CORES, FONTE, inicioCena, juntaC6, tempoNomesC6} from '../config';
+import {AbsoluteFill} from 'remotion';
+import {C6, CORES, FONTE, inicioCena, tempoNomesC6} from '../config';
 import {participantes} from '../data/participantes';
-import {Fundo, Linha, Silhueta, Svg, Texto, diagonal, ease, lerp, prog, useT} from '../componentes/base';
-import {Montagem} from '../componentes/imagens';
-import {PESSOAS} from './Cena03';
+import {Fundo, Texto, ease, lerp, prog, useT} from '../componentes/base';
 
 // =============================================================================
-// Cena 6 · Participantes (v3)
-// Os nomes acendem um por vez, ESPALHADOS pela tela. Depois voam e se organizam
-// dentro de uma caixa, em grade. Sem nós, sem linhas de rede, sem nomes de área.
-// O layout se adapta se a lista de participantes mudar.
+// Cena 6 · Participantes (v4)
+// 1. Os nomes surgem espalhados pela tela, em profundidades diferentes, flutuando.
+// 2. Todos se movem juntos e formam um bloco 4 x 4 centralizado.
+// 3. Uma luz quente acende atrás do bloco; os nomes ficam 100% brancos.
+// Fundo marinho liso com vinheta. O layout se adapta se a lista mudar.
 // =============================================================================
-const AREA = {x0: 120, x1: 1800, y0: 130, y1: 740};
+const AREA = {x0: 90, x1: 1830, y0: 100, y1: 860}; // fora da faixa da legenda (y > 900)
+const BLOCO = {fonte: 34, cy: 430, vao: 80, linha: 64, opacidade: 0.7};
+const TEXTO_Y = 600;
 
 let ctxMedida: CanvasRenderingContext2D | null = null;
 const medir = (txt: string, px: number) => {
@@ -20,85 +22,103 @@ const medir = (txt: string, px: number) => {
   return ctxMedida!.measureText(txt).width;
 };
 
-// pseudo-aleatório determinístico (mesmo resultado em todo render)
+// pseudo-aleatório com seed fixa (mesmo resultado em todo render)
 const rnd = (i: number) => {
   const x = Math.sin(i * 127.1 + 311.7) * 43758.5453;
   return x - Math.floor(x);
 };
 
-type Pos = {x: number; y: number};
-export type LayoutNomes = {fonte: number; linhaH: number; espalhado: Pos[]; organizado: Pos[]; larguras: number[]; caixa: {x: number; y: number; w: number; h: number}};
+type Pos = {x: number; y: number}; // centro do nome
+type Solto = Pos & {px: number; op: number; blur: number};
+export type LayoutNomes = {espalhado: Solto[]; bloco: Pos[]; centro: Pos};
 
 export const layoutNomes = (): LayoutNomes => {
   const n = participantes.length;
-  const fonte = n > 20 ? 24 : 28;
-  const linhaH = Math.round(fonte * 1.75);
-  const larguras = participantes.map((p) => medir(p.nome, fonte));
-  const alt = fonte * 1.2;
 
-  // organizado: grade equilibrada (4 colunas), centralizada numa caixa
+  // bloco: 4 colunas, na ordem da lista, cada coluna centralizada
   const nCol = n > 20 ? 5 : 4;
   const porCol = Math.ceil(n / nCol);
   const colunas = Array.from({length: nCol}, (_, c) => participantes.map((_, i) => i).slice(c * porCol, (c + 1) * porCol)).filter((c) => c.length);
-  const largCol = colunas.map((c) => Math.max(...c.map((i) => larguras[i])));
-  const vao = 64;
-  const larguraBloco = largCol.reduce((s, w) => s + w, 0) + vao * (colunas.length - 1);
-  const alturaBloco = (porCol - 1) * linhaH + alt;
-  const x0 = 960 - larguraBloco / 2;
-  const y0 = 420 - alturaBloco / 2;
-  const organizado: Pos[] = participantes.map(() => ({x: 0, y: 0}));
-  let x = x0;
+  const largCol = colunas.map((c) => Math.max(...c.map((i) => medir(participantes[i].nome, BLOCO.fonte))));
+  const largura = largCol.reduce((s, w) => s + w, 0) + BLOCO.vao * (colunas.length - 1);
+  const y0 = BLOCO.cy - ((porCol - 1) * BLOCO.linha) / 2;
+  const bloco: Pos[] = participantes.map(() => ({x: 0, y: 0}));
+  let x = 960 - largura / 2;
   colunas.forEach((c, k) => {
-    c.forEach((i, r) => { organizado[i] = {x, y: y0 + r * linhaH}; });
-    x += largCol[k] + vao;
+    c.forEach((i, r) => { bloco[i] = {x: x + largCol[k] / 2, y: y0 + r * BLOCO.linha}; });
+    x += largCol[k] + BLOCO.vao;
   });
-  const pad = 52;
-  const caixa = {x: x0 - pad, y: y0 - pad, w: larguraBloco + pad * 2, h: alturaBloco + pad * 2};
 
-  // espalhado: uma célula por nome (ordem embaralhada) com deslocamento aleatório → tela toda, sem sobreposição
-  const gc = Math.ceil(Math.sqrt(n * 1.6)), gl = Math.ceil(n / gc);
-  const cw = (AREA.x1 - AREA.x0) / gc, ch = (AREA.y1 - AREA.y0) / gl;
-  const celulas = Array.from({length: gc * gl}, (_, k) => k).sort((p, q) => rnd(p + 101) - rnd(q + 101)).slice(0, n);
-  const espalhado: Pos[] = participantes.map((_, i) => {
-    const c = celulas[i] % gc, l = Math.floor(celulas[i] / gc);
-    const folgaX = Math.max(0, cw - larguras[i] - 24), folgaY = Math.max(0, ch - alt - 16);
-    return {x: AREA.x0 + c * cw + rnd(i * 13 + 7) * folgaX, y: AREA.y0 + l * ch + rnd(i * 29 + 5) * folgaY};
+  // espalhado: tamanho 28–44 px (profundidade), posição por "melhor candidato" sem sobreposição
+  const espalhado: Solto[] = [];
+  const caixas: {x0: number; x1: number; y0: number; y1: number}[] = [];
+  participantes.forEach((p, i) => {
+    const px = Math.round(28 + rnd(i * 7 + 1) * 16);
+    const w = medir(p.nome, px), h = px * 1.2;
+    let melhor: Pos | null = null, melhorD = -1;
+    for (let c = 0; c < 120; c++) {
+      const cand = {
+        x: AREA.x0 + w / 2 + rnd(i * 977 + c * 13 + 5) * (AREA.x1 - AREA.x0 - w),
+        y: AREA.y0 + h / 2 + rnd(i * 619 + c * 31 + 9) * (AREA.y1 - AREA.y0 - h),
+      };
+      const cx = {x0: cand.x - w / 2 - 28, x1: cand.x + w / 2 + 28, y0: cand.y - h / 2 - 20, y1: cand.y + h / 2 + 20};
+      if (caixas.some((b) => cx.x0 < b.x1 && b.x0 < cx.x1 && cx.y0 < b.y1 && b.y0 < cx.y1)) continue;
+      const d = Math.min(1e9, ...espalhado.map((q) => Math.hypot((q.x - cand.x) * 0.6, q.y - cand.y)));
+      if (d > melhorD) { melhorD = d; melhor = cand; }
+    }
+    const pos = melhor ?? {x: AREA.x0 + w / 2, y: AREA.y0 + h / 2};
+    caixas.push({x0: pos.x - w / 2, x1: pos.x + w / 2, y0: pos.y - h / 2, y1: pos.y + h / 2});
+    const prof = (px - 28) / 16; // 0 = longe, 1 = perto
+    espalhado.push({...pos, px, op: 0.35 + 0.35 * prof, blur: px < 34 ? ((34 - px) / 6) * 1.4 : 0});
   });
-  return {fonte, linhaH, espalhado, organizado, larguras, caixa};
+  return {espalhado, bloco, centro: {x: 960, y: BLOCO.cy}};
 };
 
-// Nomes: espalhados (junta = 0) → organizados na caixa (junta = 1)
-export const Nomes: React.FC<{t: number; L: LayoutNomes; tNomes: number[]; tJunta: number; estatico?: boolean}> = ({t, L, tNomes, tJunta, estatico = false}) => {
-  const mold = estatico ? 1 : prog(t, tJunta + 1.1, 0.7);
-  const {x: mx, y: my, w: mw, h: mh} = L.caixa;
+// ease-in-out cúbico
+const cubico = (k: number) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+
+// intensidade da luz atrás do bloco: flicker de 3 quadros, depois acende rápido
+const intensidadeLuz = (t: number, luz: number) => {
+  if (t < luz) return 0;
+  const q = Math.floor((t - luz) * 30);
+  if (q < 3) return [0.55, 0.12, 0.75][q];
+  return lerp(0.75, 1, ease(Math.min(1, (t - luz - 0.1) / 0.3)));
+};
+
+export const Nomes: React.FC<{t: number; L: LayoutNomes; tNomes: number[]; estatico?: boolean}> = ({t, L, tNomes, estatico = false}) => {
+  const luz = estatico ? 1 : intensidadeLuz(t, C6.luz);
+  const raio = estatico ? 1 : Math.min(1, Math.max(0, (t - C6.luz) / 0.4)); // a luz se abre do centro
   return (
     <>
-      {mold > 0 && (
-        <Svg>
-          <rect x={mx} y={my} width={mw} height={mh} rx={6} fill={CORES.marinho2} fillOpacity={0.3 * mold} />
-          <rect x={mx} y={my} width={mw} height={mh} rx={6} fill="none" stroke={CORES.aco} strokeWidth={1.5}
-            strokeDasharray={`${2 * (mw + mh)}`} strokeDashoffset={2 * (mw + mh) * (1 - mold)} />
-        </Svg>
+      {luz > 0 && (
+        <div
+          style={{
+            position: 'absolute', left: L.centro.x - 820, top: L.centro.y - 430, width: 1640, height: 860,
+            opacity: 0.4 * luz, transform: `scale(${0.35 + 0.65 * ease(raio)})`,
+            background: `radial-gradient(ellipse at center, ${CORES.laranjaBrilho} 0%, ${CORES.laranja}99 32%, rgba(247,139,21,0.18) 55%, rgba(0,42,70,0) 72%)`,
+          }}
+        />
       )}
       {participantes.map((p, i) => {
-        const t0 = tNomes[i];
-        const vis = estatico ? 1 : prog(t, t0, 0.3);
+        const e = L.espalhado[i], b = L.bloco[i];
+        const vis = estatico ? 1 : prog(t, tNomes[i], 0.35);
         if (vis <= 0) return null;
-        // cada nome sai em sequência rápida rumo à caixa
-        const k = estatico ? 1 : ease(Math.min(1, Math.max(0, (t - tJunta - i * 0.04) / 0.9)));
-        const e = L.espalhado[i], o = L.organizado[i];
-        const flutua = (1 - k) * 6;
-        const x = lerp(e.x, o.x, k) + Math.sin(t * 0.9 + i) * flutua;
-        const y = lerp(e.y, o.y, k) + Math.cos(t * 0.8 + i * 1.7) * flutua;
-        const quente = estatico ? 0 : Math.max(0, 1 - (t - t0) / 0.8);
+        const k = estatico ? 1 : cubico(Math.min(1, Math.max(0, (t - C6.junta - i * C6.stagger) / C6.viagem)));
+        const deriva = 1 - k;
+        const x = lerp(e.x, b.x, k) + Math.sin(t * 0.45 + i * 1.3) * 7 * deriva;
+        const y = lerp(e.y, b.y, k) + Math.cos(t * 0.38 + i * 2.1) * 5 * deriva;
+        // a luz chega no nome conforme a distância do centro
+        const dist = Math.hypot(b.x - L.centro.x, b.y - L.centro.y);
+        const aceso = estatico ? 1 : prog(t, C6.luz + 0.05 + dist / 1600, 0.25);
+        const op = lerp(lerp(e.op, BLOCO.opacidade, k), 1, aceso);
         return (
           <div
             key={p.nome}
             style={{
-              position: 'absolute', left: x, top: y, fontSize: L.fonte, whiteSpace: 'nowrap', opacity: vis,
-              transform: `scale(${0.85 + 0.15 * vis})`, transformOrigin: 'left center',
-              color: quente > 0.05 ? `rgb(255,${Math.round(255 - 92 * quente)},${Math.round(255 - 186 * quente)})` : CORES.branco,
-              textShadow: quente > 0.05 ? `0 0 ${14 * quente}px rgba(248,163,69,${0.9 * quente})` : 'none',
+              position: 'absolute', left: x, top: y, whiteSpace: 'nowrap', color: CORES.branco,
+              fontSize: lerp(e.px, BLOCO.fonte, k), lineHeight: 1,
+              opacity: op * vis, filter: e.blur * deriva > 0.05 ? `blur(${e.blur * deriva}px)` : undefined,
+              transform: `translate(-50%, -50%) scale(${0.9 + 0.1 * vis})`,
             }}
           >
             {p.nome}
@@ -111,28 +131,19 @@ export const Nomes: React.FC<{t: number; L: LayoutNomes; tNomes: number[]; tJunt
 
 export const temposNomes = () => {
   const base = inicioCena(5);
-  return {L: layoutNomes(), tNomes: tempoNomesC6().map((x) => x - base), tJunta: juntaC6()};
+  return {L: layoutNomes(), tNomes: tempoNomesC6().map((x) => x - base)};
 };
 
 export const Cena06: React.FC = () => {
   const t = useT();
-  const {L, tNomes, tJunta} = temposNomes();
+  const {L, tNomes} = temposNomes();
   return (
     <Fundo>
-      {/* linhas de transmissão ao fundo, bem discretas */}
-      <Montagem planos={[{t: 0, nome: 'linhas_transmissao_noite', inicio: 0, corte: true}, {t: 8, nome: 'torres_silhueta', inicio: 2}]} fim={16} veu={0.8} />
-      <Svg>
-        <Linha {...diagonal(-80)} p={prog(t, 0.2, 0.8)} largura={1} opacidade={0.18} />
-        <Linha {...diagonal(1560)} p={prog(t, 0.3, 0.8)} largura={1} opacidade={0.18} />
-        {PESSOAS.map((s, i) => (
-          <g key={i} opacity={1 - prog(t, 0, 0.5)}>
-            <Silhueta x={s.x} y={s.y} cor={CORES.branco} />
-          </g>
-        ))}
-      </Svg>
-      <Nomes t={t} L={L} tNomes={tNomes} tJunta={tJunta} />
-      <Texto x={960} y={790} alinhar="centro" largura={1600} p={prog(t, tJunta + 1.6, 0.5)} estilo={{fontSize: 50}}>
-        {participantes.length} participantes. <span style={{color: CORES.aco}}>Três dias juntos.</span>
+      {/* vinheta suave sobre o marinho liso */}
+      <AbsoluteFill style={{background: 'radial-gradient(ellipse at 50% 45%, rgba(0,42,70,0) 45%, rgba(0,16,30,0.55) 100%)'}} />
+      <Nomes t={t} L={L} tNomes={tNomes} />
+      <Texto x={960} y={TEXTO_Y} alinhar="centro" largura={1600} p={prog(t, C6.texto, 0.5)} estilo={{fontSize: 50}}>
+        {participantes.length} pessoas do ONS. <span style={{color: CORES.aco}}>Uma turma.</span>
       </Texto>
     </Fundo>
   );

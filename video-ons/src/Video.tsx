@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, Audio, Sequence, Series, staticFile, useVideoConfig} from 'remotion';
-import {AJUSTE_FALA, AUDIO, CENAS, CORES, SONS, falaAjustada, inicioCena, quadros} from './config';
+import {AJUSTE_FALA, AUDIO, CENAS, CORES, SONS, falaAjustada, inicioCena, luzC6, quadros} from './config';
 import {LOCUCAO} from './locucao.ts';
 import {Legendas} from './componentes/Legendas';
 import {Cena01} from './cenas/Cena01';
@@ -61,6 +61,12 @@ export const Video: React.FC<PropsVideo> = ({temLocucao, temTrilha, legendas}) =
     }
     return g;
   };
+  // Cena 6: leve subida da trilha (+2 dB) quando a luz acende; volta ao normal antes da Cena 7
+  const subida = (t: number) => {
+    const a = luzC6(), fim = inicioCena(6);
+    const k = Math.min(1, Math.max(0, (t - a) / 0.4)) * Math.min(1, Math.max(0, (fim - t) / 1.0));
+    return 1 + (db(2) - 1) * k;
+  };
   return (
     <AbsoluteFill style={{backgroundColor: CORES.marinho}}>
       <Series>
@@ -75,7 +81,7 @@ export const Video: React.FC<PropsVideo> = ({temLocucao, temTrilha, legendas}) =
         })}
       </Series>
       {legendas && <Legendas />}
-      {temTrilha && <Audio src={staticFile(AUDIO.trilha)} volume={(f) => ducking(f / fps)} name="trilha" />}
+      {temTrilha && <Audio src={staticFile(AUDIO.trilha)} volume={(f) => ducking(f / fps) * subida(f / fps)} name="trilha" />}
       {SONS().map((s, i) => (
         <Sequence key={i} from={Math.max(0, quadros(s.t))} durationInFrames={s.dur ? quadros(s.dur) : undefined} layout="none" name={s.arquivo}>
           {/* rampa de 3 quadros (100 ms) na entrada: sem estalo */}

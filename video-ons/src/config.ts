@@ -87,14 +87,13 @@ export const cargasC2 = (): number[] => {
 };
 // Cena 3: checks do card
 export const checksC3 = (): number[] => [1, 2, 3].map((k) => inicioCena(2) + frasesCena(2)[k].ini + 0.3);
-// Cena 6: os nomes acendem um por vez, na batida (0,5 s), a partir da 2ª frase
-export const tempoNomesC6 = (): number[] => {
-  const base = inicioCena(5), fr = frasesCena(5);
-  const ini = naBatida(base + (fr[1] ? fr[1].ini : fr[0].fim + 0.3));
-  return participantes.map((_, k) => ini + k * BATIDA);
-};
-// Cena 6: depois do último nome, os nomes espalhados voam para a caixa
-export const juntaC6 = (): number => tempoNomesC6()[participantes.length - 1] + 0.9 - inicioCena(5);
+// Cena 6 (v4), tempos locais da cena (16 s), na grade da trilha (120 BPM):
+//   1º terço: nomes surgem espalhados, um a cada meia batida
+//   2º terço: todos se movem juntos (stagger de 40 ms) até o bloco 4 x 4
+//   3º terço: a luz acende atrás do bloco; depois o texto
+export const C6 = {nomes0: 0.5, passo: 0.25, junta: 6.0, viagem: 2.6, stagger: 0.04, luz: 9.5, texto: 10.3};
+export const tempoNomesC6 = (): number[] => participantes.map((_, k) => inicioCena(5) + C6.nomes0 + k * C6.passo);
+export const luzC6 = (): number => inicioCena(5) + C6.luz;
 // Cena 7: cada marco se destaca na palavra correspondente
 export const marcosC7 = (): number[] => [1, 2, 3, 4].map((k) => naBatida(inicioCena(6) + frasesCena(6)[k].ini, 2));
 
@@ -116,7 +115,8 @@ export const SONS = (): Som[] => [
   ...tempoCardsC4().map((t, k) => ({t: t - 0.08, arquivo: SFX.whoosh, db: -17, onde: `Cena 4 · card ${k + 1}`})),
   {t: MUSICA.drop - ATAQUE_POWERUP, arquivo: SFX.powerup, db: -13, onde: 'Cena 5 · reconexão (drop)'},
   ...tempoSilhuetasC5().map((t, k) => ({t, arquivo: SFX.clique, db: -16, onde: `Cena 5 · silhueta ${k + 1}`})),
-  ...tempoNomesC6().map((t, k) => ({t, arquivo: SFX.clique, db: -21, tom: [1, 1.06, 0.95, 1.12, 0.9, 1.03][k % 6], onde: `Cena 6 · nome ${k + 1}`})),
+  ...tempoNomesC6().map((t, k) => ({t, arquivo: SFX.clique, db: -25, tom: [1, 1.06, 0.95, 1.12, 0.9, 1.03][k % 6], onde: `Cena 6 · nome ${k + 1}`})),
+  {t: luzC6(), arquivo: SFX.clique, db: -15, onde: 'Cena 6 · a luz acende atrás do bloco'},
   ...marcosC7().map((t, k) => ({t: t - 0.08, arquivo: SFX.whoosh, db: -17, onde: `Cena 7 · marco ${k + 1}`})),
   {t: naBatida(inicioCena(7) + frasesCena(7)[1].ini) - ATAQUE_POWERUP, arquivo: SFX.powerup, db: -13, onde: 'Cena 8 · "Agora é fazer chegar"'},
 ];
@@ -176,7 +176,7 @@ export const CENAS: Cena[] = [
     titulo: 'Participantes',
     duracao: 16,
     still: 15.2,
-    loc: 'E é isso que vamos aprender juntos. Pessoas selecionadas para este treinamento.',
+    loc: 'E é isso que vamos aprender juntos. Vocês foram escolhidos pelo ONS para essa formação.',
   },
   {
     id: 'Cena07',
