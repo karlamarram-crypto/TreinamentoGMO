@@ -93,8 +93,8 @@ export const tempoNomesC6 = (): number[] => {
   const ini = naBatida(base + (fr[1] ? fr[1].ini : fr[0].fim + 0.3));
   return participantes.map((_, k) => ini + k * BATIDA);
 };
-// Cena 6: as colunas se juntam na sala depois do último nome
-export const juntaC6 = (): number => tempoNomesC6()[participantes.length - 1] + 0.75 - inicioCena(5);
+// Cena 6: depois do último nome, os nomes espalhados voam para a caixa
+export const juntaC6 = (): number => tempoNomesC6()[participantes.length - 1] + 0.9 - inicioCena(5);
 // Cena 7: cada marco se destaca na palavra correspondente
 export const marcosC7 = (): number[] => [1, 2, 3, 4].map((k) => naBatida(inicioCena(6) + frasesCena(6)[k].ini, 2));
 
@@ -173,10 +173,10 @@ export const CENAS: Cena[] = [
   },
   {
     id: 'Cena06',
-    titulo: 'Juntos na mesma sala',
+    titulo: 'Participantes',
     duracao: 16,
     still: 15.2,
-    loc: 'E é isso que vamos aprender juntos. Pessoas de áreas diferentes, na mesma sala.',
+    loc: 'E é isso que vamos aprender juntos. Pessoas selecionadas para este treinamento.',
   },
   {
     id: 'Cena07',

@@ -2,7 +2,7 @@ import React from 'react';
 import {CORES, inicioCena, marcosC7} from '../config';
 import {Montagem} from '../componentes/imagens';
 import {Card, Fundo, Linha, PulsoNaLinha, Rotulo, Svg, diagonal, lerp, prog, useT} from '../componentes/base';
-import {Sala, temposSala} from './Cena06';
+import {Nomes, temposNomes} from './Cena06';
 
 // Cena 7 · A jornada: linha do tempo diagonal com quatro marcos
 export const MARCOS = [
@@ -18,7 +18,7 @@ export const Cena07: React.FC = () => {
   const t = useT();
   const destaques = marcosC7().map((x) => x - inicioCena(6));
   const entra = (i: number) => 0.5 + i * 0.6;
-  const sala = temposSala();
+  const nomes = temposNomes();
   const recua = prog(t, 0, 0.6);
   const ini = marco(0), fim = marco(3);
   return (
@@ -35,7 +35,7 @@ export const Cena07: React.FC = () => {
       {/* a rede recua */}
       {recua < 1 && (
         <div style={{position: 'absolute', inset: 0, opacity: 1 - recua, transform: `scale(${1 - 0.35 * recua})`, transformOrigin: '960px 470px'}}>
-          <Sala t={99} L={sala.L} tNomes={sala.tNomes} tRotulos={sala.tRotulos} junta={1} tMoldura={0} />
+          <Nomes t={99} L={nomes.L} tNomes={nomes.tNomes} tJunta={0} estatico />
         </div>
       )}
       <Svg>
