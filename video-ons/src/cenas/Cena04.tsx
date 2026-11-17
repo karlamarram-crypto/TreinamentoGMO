@@ -2,7 +2,7 @@ import React from 'react';
 import {AbsoluteFill} from 'remotion';
 import {CORES, MUSICA, inicioCena, montagemC4, tempoCardsC4} from '../config';
 import {Card, Fundo, Icone, Rotulo, prog, useT} from '../componentes/base';
-import {Imagem, NomeImagem, WipeDiagonal} from '../componentes/imagens';
+import {Montagem} from '../componentes/imagens';
 
 // Cena 4 · Tudo ao mesmo tempo (v2): clipes duotone cortados no beat atrás dos cards
 export const MUDANCAS = [
@@ -41,21 +41,11 @@ export const Cena04: React.FC = () => {
   const base = inicioCena(3);
   const T = base + t;
   const cards = tempoCardsC4().map((c) => c - base);
-  const mont = montagemC4();
+  const mont = montagemC4().map((m) => ({...m, t: m.t - base}));
   const junta = prog(T, cards[3] + 0.6, MUSICA.corteRiser - cards[3] - base - 0.8);
-  // imagem atual e a anterior (para o wipe diagonal)
-  let atual = 0;
-  mont.forEach((m, k) => { if (T >= m.t) atual = k; });
-  const ant = Math.max(0, atual - 1);
-  const kWipe = atual === 0 ? 1 : prog(T, mont[atual].t, 0.18);
-  const fimDe = (k: number) => (mont[k + 1] ? mont[k + 1].t : MUSICA.corteRiser);
-  const kb = (k: number) => Math.min(1, (T - mont[k].t) / Math.max(0.5, fimDe(k) - mont[k].t));
   return (
     <Fundo>
-      <Imagem nome={mont[ant].nome as NomeImagem} k={kb(ant)} t={T} veu={0.45} />
-      <WipeDiagonal k={kWipe}>
-        <Imagem nome={mont[atual].nome as NomeImagem} k={kb(atual)} t={T} veu={0.45} />
-      </WipeDiagonal>
+      <Montagem planos={mont} fim={MUSICA.corteRiser - base} veu={0.42} />
       <AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(0,42,70,0.55) 0%, rgba(0,42,70,0) 30%)'}} />
       <Rotulo texto="O ONS hoje" x={96} y={120} p={prog(t, 0.2, 0.5)} cor={CORES.cinzaClaro} />
       <CardsMudanca t={t} entradas={cards} junta={junta} />

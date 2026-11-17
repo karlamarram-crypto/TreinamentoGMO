@@ -1,8 +1,10 @@
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
-import {CORES, MUSICA, frasesCena, inicioCena, tempoSilhuetasC5} from '../config';
+import {CORES, FIM_LAMPADAS_C5, MUSICA, frasesCena, inicioCena, lampadasC5, tempoSilhuetasC5} from '../config';
 import {Fundo, Linha, PulsoNaLinha, Rotulo, Silhueta, Svg, Texto, diagonal, lerp, prog, useT} from '../componentes/base';
 import {LinhaInterrompida, PESSOAS, TRANSMISSAO} from './Cena03';
+import {Imagem, Montagem} from '../componentes/imagens';
+import {Sequence} from 'remotion';
 
 // Cena 5 · A virada (v2): frase no silêncio, fundo quase vazio; reconexão no drop da trilha
 export const Cena05: React.FC = () => {
@@ -16,8 +18,17 @@ export const Cena05: React.FC = () => {
   const yRow = PESSOAS[0].y + 12;
   const kFila = prog(t, drop + 0.4, acende[acende.length - 1] - drop - 0.2);
   const flash = t >= drop && t < drop + 2 / 30 ? 0.3 : 0;
+  const lamp = lampadasC5().map((l) => ({...l, t: l.t - base, tratamento: 'luz' as const, corte: true, veu: 0.12}));
+  const fimLamp = FIM_LAMPADAS_C5 - base;
+  const emLampadas = t >= lamp[0].t && t < fimLamp;
   return (
     <Fundo>
+      {/* depois das lâmpadas: cidade iluminada ao fundo, bem sutil */}
+      <Sequence from={Math.round(fimLamp * 30)} layout="none" name="cidade ao fundo">
+        <AbsoluteFill style={{opacity: 0.32}}>
+          <Imagem nome="cidade_noite_panorama" k={prog(t, fimLamp, 14 - fimLamp)} t={t} veu={0.35} inicio={2} />
+        </AbsoluteFill>
+      </Sequence>
       <Svg>
         <Linha {...diagonal(420)} p={prog(t, 0.4, 0.6)} largura={1} opacidade={0.35} />
         <g opacity={prog(t, fr[1].ini + 1.2, 0.5)}>
@@ -44,6 +55,9 @@ export const Cena05: React.FC = () => {
         Ele termina no dia em que as pessoas deixam de trabalhar do jeito antigo.
       </Texto>
       <Rotulo texto="A gestão da mudança é a transmissão" x={1824} y={470} alinhar="direita" p={prog(t, fr[2].ini - 0.05, 0.45)} />
+      {/* power-up lúdico: lâmpadas acendendo em sequência, cortes secos no ritmo */}
+      {t < fimLamp + 0.05 && <Montagem planos={lamp} fim={fimLamp} />}
+      {emLampadas && <AbsoluteFill style={{background: 'radial-gradient(circle at 50% 50%, rgba(248,163,69,0.18), rgba(0,42,70,0) 60%)'}} />}
       {flash > 0 && <AbsoluteFill style={{backgroundColor: CORES.branco, opacity: flash}} />}
     </Fundo>
   );

@@ -53,20 +53,28 @@ export const tempoCardsC4 = (): number[] => {
   const i = 3, base = inicioCena(i), fr = frasesCena(i)[1];
   return [0, 1, 2, 3].map((k) => naBatida(base + fr.ini + ((fr.fim - fr.ini) * k) / 4, 2));
 };
-// Cena 4: troca de imagem (clipes de 0,5 a 2 s, acelerando com o riser até o corte)
-export const montagemC4 = (): {t: number; nome: string}[] => {
-  const base = inicioCena(3), c = tempoCardsC4();
-  const nomes = ['reuniao', 'normas', 'sistema', 'sala_controle'];
+// Cena 4: troca de imagem (planos de 0,25 a 2 s, acelerando com o riser até o corte)
+export const montagemC4 = (): {t: number; nome: string; inicio?: number; tratamento?: 'duotone' | 'luz'}[] => {
+  const base = inicioCena(3), c = tempoCardsC4(), R = MUSICA.corteRiser;
   return [
-    {t: base, nome: 'sala_controle'}, {t: base + 1.5, nome: 'sistema'},
-    ...c.map((t, k) => ({t, nome: nomes[k]})),
-    {t: MUSICA.corteRiser - 1.5, nome: 'reuniao'}, {t: MUSICA.corteRiser - 1.0, nome: 'normas'},
-    {t: MUSICA.corteRiser - 0.5, nome: 'sistema'}, {t: MUSICA.corteRiser - 0.25, nome: 'sala_controle'},
+    {t: base, nome: 'sala_controle', inicio: 4}, {t: base + 1.5, nome: 'escritorio_equipe', inicio: 6},
+    {t: c[0], nome: 'reuniao', inicio: 2}, {t: c[1], nome: 'normas', inicio: 1},
+    {t: c[2], nome: 'sistema', inicio: 3}, {t: c[3], nome: 'workshop_planejamento', inicio: 2},
+    {t: R - 1.5, nome: 'cidade_noite_aerea', inicio: 3}, {t: R - 1.0, nome: 'fluorescente_falhando', inicio: 2, tratamento: 'luz'},
+    {t: R - 0.5, nome: 'filamento_falhando', inicio: 1, tratamento: 'luz'}, {t: R - 0.25, nome: 'raios_noite', inicio: 3, tratamento: 'luz'},
   ];
 };
+// Cena 5: logo depois do drop, montagem rápida de lâmpadas acendendo (no ritmo, em semicolcheias)
+export const lampadasC5 = (): {t: number; nome: string; inicio: number}[] => [
+  {t: MUSICA.drop + 0.5, nome: 'lampada_interruptor', inicio: 2.2},
+  {t: MUSICA.drop + 0.75, nome: 'tres_lampadas', inicio: 6},
+  {t: MUSICA.drop + 1.0, nome: 'lampada_acendendo', inicio: 4},
+  {t: MUSICA.drop + 1.25, nome: 'bola_energia', inicio: 3},
+];
+export const FIM_LAMPADAS_C5 = MUSICA.drop + 1.75;
 // Cena 5: silhuetas acendem uma a uma, em colcheias, logo depois do drop
 export const N_SILHUETAS = 9;
-export const tempoSilhuetasC5 = (): number[] => Array.from({length: N_SILHUETAS}, (_, k) => MUSICA.drop + 0.5 + k * 0.25);
+export const tempoSilhuetasC5 = (): number[] => Array.from({length: N_SILHUETAS}, (_, k) => FIM_LAMPADAS_C5 + 0.25 + k * 0.25);
 
 // ---------- efeitos sonoros (assets/sfx/*.wav), em tempo global ----------
 export type Som = {t: number; arquivo: string; db?: number};
@@ -76,6 +84,7 @@ export const SONS = (): Som[] => [
   {t: MUSICA.corteRiser - 9.6, arquivo: 'riser.wav', db: -6},
   // Cena 5: na reconexão, estalo forte + power-up; um clique por silhueta que acende
   {t: MUSICA.drop - 0.04, arquivo: 'estalo_powerup.wav', db: -3},
+  ...lampadasC5().map((l) => ({t: l.t, arquivo: 'clique_luz.wav', db: -5})),
   ...tempoSilhuetasC5().map((t) => ({t, arquivo: 'clique_luz.wav', db: -9})),
 ];
 // arredonda um instante (global) para a batida (ou subdivisão) mais próxima

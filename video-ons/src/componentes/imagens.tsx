@@ -1,7 +1,7 @@
 import React from 'react';
-import {AbsoluteFill, OffthreadVideo, Img, staticFile, getStaticFiles} from 'remotion';
+import {AbsoluteFill, OffthreadVideo, Img, Sequence, staticFile, getStaticFiles, useVideoConfig} from 'remotion';
 import {ALTURA, CORES, LARGURA} from '../config';
-import {DIAG, lerp} from './base';
+import {DIAG, lerp, prog, useT} from './base';
 
 // =============================================================================
 // Imagens com tratamento duotone A&M
@@ -19,7 +19,9 @@ const existe = (caminho: string) => {
   }
 };
 
-// Filtro SVG duotone: luminância → rampa marinho → azul aço → branco
+// Filtros SVG: luminância → rampa de cores da marca
+// duotone-am: marinho → azul aço → branco (pessoas, cidade, escritório)
+// luz-am: marinho → azul aço → laranja → branco (só lâmpadas e energia: o laranja entra como luz)
 export const FiltroDuotone: React.FC = () => (
   <svg width={0} height={0} style={{position: 'absolute'}}>
     <filter id="duotone-am" colorInterpolationFilters="sRGB">
@@ -28,6 +30,14 @@ export const FiltroDuotone: React.FC = () => (
         <feFuncR type="table" tableValues="0 0.2 0.369 1" />
         <feFuncG type="table" tableValues="0.165 0.329 0.541 1" />
         <feFuncB type="table" tableValues="0.275 0.427 0.702 1" />
+      </feComponentTransfer>
+    </filter>
+    <filter id="luz-am" colorInterpolationFilters="sRGB">
+      <feColorMatrix type="matrix" values="0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0 0 0 1 0" />
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="0 0.2 0.369 0.969 1" />
+        <feFuncG type="table" tableValues="0.165 0.329 0.541 0.545 1" />
+        <feFuncB type="table" tableValues="0.275 0.427 0.702 0.082 0.9" />
       </feComponentTransfer>
     </filter>
   </svg>
@@ -43,16 +53,21 @@ export const Grao: React.FC<{seed: number; opacidade?: number}> = ({seed, opacid
   </svg>
 );
 
-export type NomeImagem = 'sala_controle' | 'reuniao' | 'normas' | 'sistema' | 'cidade_noite_acendendo' | 'torres_entardecer' | 'linhas_transmissao_noite' | 'escritorio_equipe' | 'janela_casa_acendendo' | 'industria_noite' | 'hospital_fachada_noite';
+export type NomeImagem = string;
 
 // Clipe/foto com Ken Burns. k = progresso 0..1 dentro do tempo do clipe.
-export const Imagem: React.FC<{nome: NomeImagem; k: number; veu?: number; t: number; origem?: string}> = ({nome, k, veu = 0.4, t, origem = '50% 50%'}) => {
+// inicio = segundo do clipe onde começar; tratamento = 'duotone' (padrão) ou 'luz'.
+export const Imagem: React.FC<{
+  nome: NomeImagem; k: number; veu?: number; t: number; origem?: string; inicio?: number; tratamento?: 'duotone' | 'luz'; velocidade?: number;
+}> = ({nome, k, veu = 0.4, t, origem = '50% 50%', inicio = 0, tratamento = 'duotone', velocidade = 1}) => {
+  const {fps} = useVideoConfig();
   const zoom = lerp(1.0, 1.08, k);
   const clip = `clips/${nome}.mp4`;
   const foto = `fotos/${nome}.jpg`;
+  const filtro = `url(#${tratamento === 'luz' ? 'luz-am' : 'duotone-am'}) contrast(1.12)`;
   let conteudo: React.ReactNode;
-  if (existe(clip)) conteudo = <OffthreadVideo src={staticFile(clip)} muted style={{width: '100%', height: '100%', objectFit: 'cover', filter: 'url(#duotone-am) contrast(1.1)'}} />;
-  else if (existe(foto)) conteudo = <Img src={staticFile(foto)} style={{width: '100%', height: '100%', objectFit: 'cover', filter: 'url(#duotone-am) contrast(1.1)'}} />;
+  if (existe(clip)) conteudo = <OffthreadVideo src={staticFile(clip)} muted trimBefore={Math.round(inicio * fps)} playbackRate={velocidade} style={{width: '100%', height: '100%', objectFit: 'cover', filter: filtro}} />;
+  else if (existe(foto)) conteudo = <Img src={staticFile(foto)} style={{width: '100%', height: '100%', objectFit: 'cover', filter: filtro}} />;
   else conteudo = <Procedural nome={nome} t={t} />;
   return (
     <AbsoluteFill style={{overflow: 'hidden', backgroundColor: CORES.marinho}}>
@@ -62,6 +77,32 @@ export const Imagem: React.FC<{nome: NomeImagem; k: number; veu?: number; t: num
       <AbsoluteFill style={{backgroundColor: CORES.marinho, opacity: veu}} />
     </AbsoluteFill>
   );
+};
+
+// Montagem: lista de planos (tempo local de entrada); cada um entra com wipe diagonal
+// sobre o anterior e tem seu próprio Ken Burns. O vídeo de cada plano começa do seu "inicio".
+export type Plano = {t: number; nome: string; inicio?: number; tratamento?: 'duotone' | 'luz'; veu?: number; corte?: boolean};
+export const Montagem: React.FC<{planos: Plano[]; fim: number; veu?: number}> = ({planos, fim, veu = 0.45}) => {
+  const {fps} = useVideoConfig();
+  return (
+    <>
+      {planos.map((p, i) => {
+        const ate = (planos[i + 1] ? planos[i + 1].t + 0.25 : fim);
+        const dur = Math.max(1, Math.round((ate - p.t) * fps));
+        return (
+          <Sequence key={i} from={Math.round(p.t * fps)} durationInFrames={dur} layout="none" name={`plano ${p.nome}`}>
+            <PlanoMontagem p={p} dur={(planos[i + 1] ? planos[i + 1].t : fim) - p.t} primeiro={i === 0} veu={p.veu ?? veu} />
+          </Sequence>
+        );
+      })}
+    </>
+  );
+};
+const PlanoMontagem: React.FC<{p: Plano; dur: number; primeiro: boolean; veu: number}> = ({p, dur, primeiro, veu}) => {
+  const t = useT();
+  const img = <Imagem nome={p.nome} k={Math.min(1, t / Math.max(0.5, dur))} t={t} veu={veu} inicio={p.inicio} tratamento={p.tratamento} />;
+  if (primeiro || p.corte) return <AbsoluteFill>{img}</AbsoluteFill>;
+  return <WipeDiagonal k={prog(t, 0, 0.18)}>{img}</WipeDiagonal>;
 };
 
 // ---------------- equivalentes procedurais (paleta A&M) ----------------
