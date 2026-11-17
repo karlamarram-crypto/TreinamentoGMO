@@ -94,7 +94,11 @@ export const tempoNomesC6 = (): number[] => {
   const out: number[] = [];
   as.forEach((a, g) => {
     const ini = fr[g + 1] ? fr[g + 1].ini : fr[0].fim + g;
-    participantes.filter((p) => p.area === a).forEach((_, k) => out.push(naBatida(base + ini + 0.25 + k * 0.25, 2)));
+    participantes.filter((p) => p.area === a).forEach((_, k) => {
+      // um nome por vez: nunca dois cliques no mesmo instante
+      const t = naBatida(base + ini + 0.25 + k * 0.25, 2);
+      out.push(out.length ? Math.max(t, out[out.length - 1] + 0.25) : t);
+    });
   });
   return out;
 };
