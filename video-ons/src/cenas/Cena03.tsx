@@ -1,5 +1,6 @@
 import React from 'react';
-import {CORES, frasesCena} from '../config';
+import {CORES, MARCAS, checksC3, inicioCena} from '../config';
+import {Montagem} from '../componentes/imagens';
 import {Card, Fundo, Linha, PulsoNaLinha, Rotulo, Silhueta, Svg, Texto, diagonal, lerp, prog, useT} from '../componentes/base';
 
 // Geometria compartilhada com a Cena 5 (a linha interrompida que depois se reconecta)
@@ -25,30 +26,35 @@ const ETAPAS = ['Solução pronta', 'Sistema no ar', 'Projeto entregue'];
 
 export const Cena03: React.FC = () => {
   const t = useT();
-  const fr = frasesCena(2);
-  const marca = [fr[1].ini + 0.4, fr[2].ini + 0.4, fr[3].ini + 0.4];
-  const iniPulso = fr[4].ini + 0.3;
-  const kPulso = lerp(0, FALHA[0] + 0.02, prog(t, iniPulso, 2.8));
-  const forca = 1 - prog(t, iniPulso + 1.6, 1.3); // perde força antes de chegar
-  const final = Math.max(fr[4].ini + 3.0, CENA03_FINAL);
+  const base = inicioCena(2);
+  const marca = checksC3().map((x) => x - base);
+  const falha = MARCAS.falhaC3;
+  const iniPulso = falha - 1.3;
+  const kPulso = lerp(0, FALHA[0] + 0.02, prog(t, iniPulso, 1.4));
+  const forca = 1 - prog(t, falha - 0.3, 0.5); // perde força antes de chegar
+  const final = MARCAS.resultadoC3;
+  // a falha acontece nas pessoas: a luz pisca nas silhuetas e se apaga (nunca na cidade)
+  const pisca = t >= falha && t < falha + 0.9 ? [1, 0, 0.8, 0, 0.6, 0, 0.3, 0, 0][Math.floor((t - falha) / 0.1)] ?? 0 : 0;
   return (
     <Fundo>
+      <Montagem planos={[{t: 0, nome: 'datacenter_cabos', inicio: 2, corte: true}]} fim={14} veu={0.62} />
       <Svg>
         <Linha {...diagonal(1650)} p={1} largura={1} opacidade={0.18} />
-        <LinhaInterrompida p={prog(t, iniPulso - 1.6, 1.4)} />
+        <LinhaInterrompida p={prog(t, iniPulso - 0.8, 0.7)} />
         {forca > 0 && kPulso < FALHA[0] + 0.02 && (
           <PulsoNaLinha {...TRANSMISSAO} k={kPulso} opacidade={forca} id="c3" />
         )}
         {PESSOAS.map((s, i) => (
-          <g key={i} opacity={prog(t, iniPulso - 1.2 + i * 0.06, 0.8)}>
+          <g key={i} opacity={prog(t, iniPulso - 0.9 + i * 0.04, 0.4)}>
             <Silhueta x={s.x} y={s.y} cor={CORES.cinzaAzulado} />
+            {pisca > 0 && <Silhueta x={s.x} y={s.y} cor={CORES.branco} opacidade={pisca} />}
           </g>
         ))}
       </Svg>
-      <Card x={96} y={230} largura={520} altura={292} p={prog(t, 0.3, 1.0)}>
+      <Card x={96} y={230} largura={520} altura={292} p={prog(t, 0.15, 0.5)}>
         <div style={{fontSize: 18, letterSpacing: '0.25em', color: CORES.aco, textTransform: 'uppercase', marginBottom: 30}}>Projeto</div>
         {ETAPAS.map((e, i) => {
-          const k = prog(t, marca[i], 0.5);
+          const k = prog(t, marca[i], 0.3);
           return (
             <div key={e} style={{display: 'flex', alignItems: 'center', gap: 18, marginBottom: 24, fontSize: 32}}>
               <svg width={32} height={32} viewBox="0 0 32 32" style={{flex: 'none'}}>
@@ -60,9 +66,9 @@ export const Cena03: React.FC = () => {
           );
         })}
       </Card>
-      <Rotulo texto="Jeito antigo" x={PESSOAS[0].x - 28} y={640} p={prog(t, iniPulso + 1.8, 1.0)} />
-      <Texto x={1180} y={250} p={prog(t, final, 1.0)} estilo={{fontSize: 44}}>Projeto entregue.</Texto>
-      <Texto x={1180} y={318} p={prog(t, final + 0.9, 1.0)} estilo={{fontSize: 108, color: CORES.aco}}>Resultado?</Texto>
+      <Rotulo texto="Jeito antigo" x={PESSOAS[0].x - 28} y={640} p={prog(t, falha + 0.9, 0.5)} cor={CORES.cinzaClaro} />
+      <Texto x={1180} y={250} p={prog(t, final, 0.5)} estilo={{fontSize: 44}}>Projeto entregue.</Texto>
+      <Texto x={1180} y={318} p={prog(t, final + 0.6, 0.6)} estilo={{fontSize: 108, color: CORES.aco}}>Resultado?</Texto>
     </Fundo>
   );
 };

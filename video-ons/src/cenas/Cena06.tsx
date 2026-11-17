@@ -1,5 +1,7 @@
 import React from 'react';
-import {CORES, FONTE, frasesCena} from '../config';
+import {BATIDA, CORES, FONTE, MUSICA, frasesCena, inicioCena, tempoNomesC6} from '../config';
+import {Montagem} from '../componentes/imagens';
+import {AbsoluteFill} from 'remotion';
 import {participantes, frentes} from '../data/participantes';
 import {Fundo, Linha, PulsoNaLinha, Rotulo, Silhueta, Svg, Texto, diagonal, lerp, pontoNaPolilinha, prog, useT} from '../componentes/base';
 import {PESSOAS} from './Cena03';
@@ -55,7 +57,8 @@ export const layoutRede = (): LayoutRede => {
 export const temposRede = (L: LayoutRede) => {
   const fr = frasesCena(5);
   const rot = L.grupos.map((_, g) => (fr[g + 1] ? fr[g + 1].ini : fr[0].fim + g * 1.2));
-  const nome = L.nos.map((n) => rot[n.grupo] + 0.35 + L.grupos[n.grupo].nos.indexOf(n) * 0.25);
+  const tn = tempoNomesC6().map((x) => x - inicioCena(5));
+  const nome = L.nos.map((n) => tn[n.ordem]);
   return {fr, rot, nome, final: fr[fr.length - 1].ini};
 };
 
@@ -74,10 +77,14 @@ const caminhoPulso = (L: LayoutRede): [number, number][] => {
   return pts;
 };
 
-export const Rede: React.FC<{t: number; L: LayoutRede; tempos: ReturnType<typeof temposRede>; chegada?: number}> = ({t, L, tempos, chegada = 1}) => {
+export const Rede: React.FC<{t: number; L: LayoutRede; tempos: ReturnType<typeof temposRede>; chegada?: number; base?: number}> = ({t, L, tempos, chegada = 1, base = 0}) => {
   const {rot, nome, final} = tempos;
-  const kPulso = prog(t, final, 3.4);
+  const kPulso = prog(t, final, 2.4);
   const pts = caminhoPulso(L);
+  // no fim, a rede inteira pulsa junto com a batida
+  const tg = base + t;
+  const desdeBatida = (((tg - MUSICA.origem) % BATIDA) + BATIDA) % BATIDA;
+  const batida = t > final + 0.4 ? Math.exp(-desdeBatida * 9) : 0;
   return (
     <>
       <Svg>
@@ -109,7 +116,13 @@ export const Rede: React.FC<{t: number; L: LayoutRede; tempos: ReturnType<typeof
           const k = chegada;
           const x = lerp(s.x, n.x, k), y = lerp(s.y - 62, n.y, k);
           const aceso = t > nome[n.ordem] ? 1 : 0.55;
-          return <circle key={n.nome} cx={x} cy={y} r={7} fill={CORES.branco} fillOpacity={aceso} stroke={CORES.aco} strokeWidth={1.5} />;
+          const brilho = Math.max(0, 1 - (t - nome[n.ordem]) / 0.6) * (t >= nome[n.ordem] ? 1 : 0);
+          return (
+            <g key={n.nome}>
+              {brilho > 0 && <circle cx={x} cy={y} r={7 + 16 * brilho} fill={CORES.laranjaBrilho} opacity={0.5 * brilho} />}
+              <circle cx={x} cy={y} r={7 * (1 + 0.45 * batida)} fill={brilho > 0.3 ? CORES.laranjaBrilho : CORES.branco} fillOpacity={aceso} stroke={CORES.aco} strokeWidth={1.5} />
+            </g>
+          );
         })}
         {kPulso > 0 && kPulso < 1 && (() => {
           const [x, y] = pontoNaPolilinha(pts, kPulso);
@@ -118,13 +131,15 @@ export const Rede: React.FC<{t: number; L: LayoutRede; tempos: ReturnType<typeof
         })()}
       </Svg>
       {L.grupos.map((g, gi) => (
-        <Rotulo key={g.nome} texto={g.nome} x={g.x} y={AREA.yRotulo} p={prog(t, rot[gi], 0.9)} tamanho={L.fonteRotulo} />
+        <Rotulo key={g.nome} texto={g.nome} x={g.x} y={AREA.yRotulo} p={prog(t, rot[gi], 0.45)} tamanho={L.fonteRotulo} cor={CORES.cinzaClaro} />
       ))}
       {L.nos.map((n) => {
-        const p = prog(t, nome[n.ordem], 0.5);
+        const p = prog(t, nome[n.ordem], 0.25);
         if (p <= 0) return null;
+        const quente = Math.max(0, 1 - (t - nome[n.ordem]) / 0.8);
         return (
-          <div key={n.nome} style={{position: 'absolute', left: n.x + 20, top: n.y - L.fonteNome * 0.62, fontSize: L.fonteNome, whiteSpace: 'nowrap', opacity: p, transform: `translateX(${(1 - p) * -10}px)`}}>
+          <div key={n.nome} style={{position: 'absolute', left: n.x + 20, top: n.y - L.fonteNome * 0.62, fontSize: L.fonteNome, whiteSpace: 'nowrap', opacity: p, transform: `translateX(${(1 - p) * -10}px)`,
+            color: quente > 0.05 ? `rgb(255,${Math.round(255 - 92 * quente)},${Math.round(255 - 186 * quente)})` : CORES.branco, textShadow: quente > 0.05 ? `0 0 ${14 * quente}px rgba(248,163,69,${0.9 * quente})` : 'none'}}>
             {n.nome}
           </div>
         );
@@ -137,10 +152,13 @@ export const Cena06: React.FC = () => {
   const t = useT();
   const L = layoutRede();
   const tempos = temposRede(L);
-  const chegada = prog(t, 0.2, 1.6);
+  const chegada = prog(t, 0.1, 0.8);
   const nFrentes = L.grupos.length;
   return (
     <Fundo>
+      <AbsoluteFill style={{opacity: 0.22}}>
+        <Montagem planos={[{t: 0, nome: 'linhas_transmissao_noite', inicio: 0, corte: true}, {t: 8, nome: 'torres_silhueta', inicio: 2}]} fim={16} veu={0.2} />
+      </AbsoluteFill>
       <Svg>
         <Linha {...diagonal(-80)} p={prog(t, 0.4, 2)} largura={1} opacidade={0.18} />
         <Linha {...diagonal(1560)} p={prog(t, 0.6, 2)} largura={1} opacidade={0.18} />
@@ -150,8 +168,8 @@ export const Cena06: React.FC = () => {
           </g>
         ))}
       </Svg>
-      <Rede t={t} L={L} tempos={tempos} chegada={chegada} />
-      <Texto x={96} y={790} p={prog(t, tempos.final + 0.2, 1.0)} estilo={{fontSize: 50}}>
+      <Rede t={t} L={L} tempos={tempos} chegada={chegada} base={inicioCena(5)} />
+      <Texto x={96} y={790} p={prog(t, tempos.final + 0.1, 0.5)} estilo={{fontSize: 50}}>
         {participantes.length} pessoas. {nFrentes} frentes. <span style={{color: CORES.aco}}>Uma mesma rede.</span>
       </Texto>
     </Fundo>

@@ -1,28 +1,40 @@
 import React from 'react';
-import {CORES} from '../config';
-import {Fundo, Linha, LogoAM, Plano, PulsoNaLinha, Rotulo, Svg, diagonal, prog, useT} from '../componentes/base';
+import {AbsoluteFill, Sequence} from 'remotion';
+import {CORES, PRETO_C1, pulsosC1, quadros} from '../config';
+import {Fundo, Linha, LogoAM, PulsoNaLinha, Rotulo, Svg, diagonal, prog, useT} from '../componentes/base';
+import {Montagem} from '../componentes/imagens';
 
-// Cena 1 · A energia: três linhas diagonais (linhas de transmissão) e um pulso laranja.
+// Cena 1 · A energia (v2): 0,5 s de preto com zumbido; corte seco para torres ao entardecer;
+// as diagonais A&M se desenham por cima, como cabos, e o pulso laranja corre pela linha.
 export const LINHAS_C1 = [diagonal(1010), diagonal(1090), diagonal(1170)];
 
 export const Cena01: React.FC = () => {
   const t = useT();
   const [l1, l2, l3] = LINHAS_C1;
-  const pulso1 = prog(t, 3.0, 3.6);
-  const pulso2 = prog(t, 6.6, 3.6);
+  const P = PRETO_C1;
+  const [pa, pb] = pulsosC1();
   return (
     <Fundo>
+      <Sequence from={quadros(P)} layout="none" name="torres">
+        <Montagem
+          planos={[
+            {t: 0, nome: 'torres_entardecer', inicio: 5, corte: true},
+            {t: 3.5, nome: 'torres_silhueta', inicio: 9},
+          ]}
+          fim={7 - P}
+          veu={0.38}
+        />
+      </Sequence>
       <Svg>
-        <Plano x={-120} y={640} largura={760} altura={440} opacidade={0.22} p={prog(t, 0.2, 1.6)} />
-        <Plano x={-260} y={820} largura={620} altura={260} cor={CORES.aco} opacidade={0.15} p={prog(t, 0.8, 1.6)} />
-        <Linha {...l1} p={prog(t, 0.4, 2.0)} largura={2.5} />
-        <Linha {...l2} p={prog(t, 1.3, 1.9)} largura={1.5} opacidade={0.85} />
-        <Linha {...l3} p={prog(t, 1.9, 1.9)} largura={1} opacidade={0.7} />
-        <PulsoNaLinha {...l1} k={pulso1} id="c1a" />
-        <PulsoNaLinha {...l1} k={pulso2} id="c1b" />
+        <Linha {...l1} p={prog(t, P + 0.1, 0.9)} largura={2.5} />
+        <Linha {...l2} p={prog(t, P + 0.35, 0.9)} largura={1.5} opacidade={0.85} />
+        <Linha {...l3} p={prog(t, P + 0.6, 0.9)} largura={1} opacidade={0.7} />
+        <PulsoNaLinha {...l1} k={prog(t, pa, 1.9)} id="c1a" />
+        <PulsoNaLinha {...l1} k={prog(t, pb, 1.9)} id="c1b" />
       </Svg>
-      <LogoAM p={prog(t, 0.6, 1.2)} />
-      <Rotulo texto="Sistema Interligado Nacional" x={96} y={520} p={prog(t, 1.6, 1.2)} />
+      <LogoAM p={prog(t, P + 0.2, 0.5)} />
+      <Rotulo texto="Sistema Interligado Nacional" x={96} y={520} p={prog(t, P + 0.6, 0.5)} cor={CORES.cinzaClaro} />
+      {t < P && <AbsoluteFill style={{backgroundColor: '#000'}} />}
     </Fundo>
   );
 };

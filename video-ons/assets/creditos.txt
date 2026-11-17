@@ -1,12 +1,10 @@
 Créditos das imagens (assets/clips/)
 Todos do Mixkit (https://mixkit.co), Mixkit Stock Video Free License: uso comercial permitido, sem atribuição obrigatória.
 Arquivo | Origem | Página | Licença
-bola_energia.mp4 | Mixkit #45080 "hands-pressing-on-an-electric-ball-of-light" | https://mixkit.co/free-stock-video/hands-pressing-on-an-electric-ball-of-light-45080/ | Mixkit Stock Video Free License
 cidade_drone_luzes.mp4 | Mixkit #16610 "drone-flying-over-city-lights" | https://mixkit.co/free-stock-video/drone-flying-over-city-lights-16610/ | Mixkit Stock Video Free License
 cidade_noite_acendendo.mp4 | Mixkit #49847 "reverse-aerial-shot-of-a-city-at-night" | https://mixkit.co/free-stock-video/reverse-aerial-shot-of-a-city-at-night-49847/ | Mixkit Stock Video Free License
 cidade_noite_aerea.mp4 | Mixkit #42342 "aerial-shot-of-a-city-at-night" | https://mixkit.co/free-stock-video/aerial-shot-of-a-city-at-night-42342/ | Mixkit Stock Video Free License
 cidade_noite_panorama.mp4 | Mixkit #49846 "side-by-side-aerial-view-of-a-city-at-night" | https://mixkit.co/free-stock-video/side-by-side-aerial-view-of-a-city-at-night-49846/ | Mixkit Stock Video Free License
-escritorio_equipe.mp4 | Mixkit #4809 "business-people-at-work-meeting" | https://mixkit.co/free-stock-video/business-people-at-work-meeting-4809/ | Mixkit Stock Video Free License
 filamento_acendendo.mp4 | Mixkit #48292 "light-bulb-filament-lighting-up" | https://mixkit.co/free-stock-video/light-bulb-filament-lighting-up-48292/ | Mixkit Stock Video Free License
 filamento_falhando.mp4 | Mixkit #48296 "light-bulb-filament-flickering" | https://mixkit.co/free-stock-video/light-bulb-filament-flickering-48296/ | Mixkit Stock Video Free License
 fluorescente_falhando.mp4 | Mixkit #48027 "fluorescent-light-turning-on-and-off" | https://mixkit.co/free-stock-video/fluorescent-light-turning-on-and-off-48027/ | Mixkit Stock Video Free License
@@ -16,15 +14,18 @@ lampada_acendendo.mp4 | Mixkit #48297 "light-bulb-illuminating-in-the-dark" | ht
 lampada_incandescente.mp4 | Mixkit #35004 "incandescent-light-bulb-turning-on" | https://mixkit.co/free-stock-video/incandescent-light-bulb-turning-on-35004/ | Mixkit Stock Video Free License
 lampada_interruptor.mp4 | Mixkit #47241 "close-up-of-a-light-bulb-being-switched-on" | https://mixkit.co/free-stock-video/close-up-of-a-light-bulb-being-switched-on-47241/ | Mixkit Stock Video Free License
 linhas_transmissao_noite.mp4 | Mixkit #16199 "storm-clouds-moving-over-power-lines" | https://mixkit.co/free-stock-video/storm-clouds-moving-over-power-lines-16199/ | Mixkit Stock Video Free License
-maos_equipe.mp4 | Mixkit #35959 "hands-in-the-middle-of-a-work-team" | https://mixkit.co/free-stock-video/hands-in-the-middle-of-a-work-team-35959/ | Mixkit Stock Video Free License
-normas.mp4 | Mixkit #241 "signing-a-contract" | https://mixkit.co/free-stock-video/signing-a-contract-241/ | Mixkit Stock Video Free License
 raios_noite.mp4 | Mixkit #25081 "lightning-in-the-night-sky" | https://mixkit.co/free-stock-video/lightning-in-the-night-sky-25081/ | Mixkit Stock Video Free License
-reuniao.mp4 | Mixkit #46680 "brainstorming-over-the-meeting-table" | https://mixkit.co/free-stock-video/brainstorming-over-the-meeting-table-46680/ | Mixkit Stock Video Free License
-sala_controle.mp4 | Mixkit #23693 "electrical-workers-in-control-room" | https://mixkit.co/free-stock-video/electrical-workers-in-control-room-23693/ | Mixkit Stock Video Free License
-sistema.mp4 | Mixkit #4835 "office-workers-hands-typing-on-their-devices" | https://mixkit.co/free-stock-video/office-workers-hands-typing-on-their-devices-4835/ | Mixkit Stock Video Free License
 torres_entardecer.mp4 | Mixkit #28351 "electric-power-lines-in-the-field-at-sunset" | https://mixkit.co/free-stock-video/electric-power-lines-in-the-field-at-sunset-28351/ | Mixkit Stock Video Free License
 torres_silhueta.mp4 | Mixkit #25181 "silhouettes-of-electric-power-lines-and-towers" | https://mixkit.co/free-stock-video/silhouettes-of-electric-power-lines-and-towers-25181/ | Mixkit Stock Video Free License
 tres_lampadas.mp4 | Mixkit #48298 "three-light-bulbs-illuminate" | https://mixkit.co/free-stock-video/three-light-bulbs-illuminate-48298/ | Mixkit Stock Video Free License
-workshop_ideias.mp4 | Mixkit #5607 "cowoworkers-look-through-ideas-on-sticky-notes" | https://mixkit.co/free-stock-video/cowoworkers-look-through-ideas-on-sticky-notes-5607/ | Mixkit Stock Video Free License
-workshop_planejamento.mp4 | Mixkit #13231 "work-team-planning-a-project-in-the-office" | https://mixkit.co/free-stock-video/work-team-planning-a-project-in-the-office-13231/ | Mixkit Stock Video Free License
-workshop_postits.mp4 | Mixkit #8813 "young-team-brainstorms-ideas-with-sticky-notes" | https://mixkit.co/free-stock-video/young-team-brainstorms-ideas-with-sticky-notes-8813/ | Mixkit Stock Video Free License
+datacenter_cabos.mp4 | Mixkit #7870 "cables-in-a-datacenter" | https://mixkit.co/free-stock-video/cables-in-a-datacenter-7870/ | Mixkit Stock Video Free License
+postes_contraluz.mp4 | Mixkit #30219 "electric-poles-and-towers-low-view" | https://mixkit.co/free-stock-video/electric-poles-and-towers-low-view-30219/ | Mixkit Stock Video Free License
+torres_campo.mp4 | Mixkit #30236 "electric-towers-passing-through-agriculture-fields" | https://mixkit.co/free-stock-video/electric-towers-passing-through-agriculture-fields-30236/ | Mixkit Stock Video Free License
+solar_aereo.mp4 | Mixkit #46623 "aerial-view-of-solar-panels-in-a-field-at-sunset" | https://mixkit.co/free-stock-video/aerial-view-of-solar-panels-in-a-field-at-sunset-46623/ | Mixkit Stock Video Free License
+eolicas_aereo.mp4 | Mixkit #51779 "aerial-view-of-many-wind-energy-mills" | https://mixkit.co/free-stock-video/aerial-view-of-many-wind-energy-mills-51779/ | Mixkit Stock Video Free License
+hidreletrica_aerea.mp4 | Mixkit #9909 "aerial-view-of-a-hydroelectric-power-plant" | https://mixkit.co/free-stock-video/aerial-view-of-a-hydroelectric-power-plant-9909/ | Mixkit Stock Video Free License
+cidade_transito_noite.mp4 | Mixkit #11 "aerial-view-of-city-traffic-at-night" | https://mixkit.co/free-stock-video/aerial-view-of-city-traffic-at-night-11/ | Mixkit Stock Video Free License
+globo_luz.mp4 | Mixkit #45366 "light-globe-illuminates-on-a-black-background" | https://mixkit.co/free-stock-video/light-globe-illuminates-on-a-black-background-45366/ | Mixkit Stock Video Free License
+esfera_eletrica.mp4 | Mixkit #14425 "red-electric-ball" | https://mixkit.co/free-stock-video/red-electric-ball-14425/ | Mixkit Stock Video Free License
+filamento_reflexo.mp4 | Mixkit #3655 "lit-filament-reflected-in-a-light-bulb" | https://mixkit.co/free-stock-video/lit-filament-reflected-in-a-light-bulb-3655/ | Mixkit Stock Video Free License
+postes_rua_noite.mp4 | Mixkit #29495 "orange-street-lamps-at-night" | https://mixkit.co/free-stock-video/orange-street-lamps-at-night-29495/ | Mixkit Stock Video Free License

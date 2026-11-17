@@ -5,6 +5,7 @@
 // v2: ~20% mais rápido (1:38), locução 1,2x, trilha 120 BPM com drop na reconexão (0:45).
 // =============================================================================
 import {LOCUCAO} from './locucao.ts';
+import {participantes, frentes} from './data/participantes.ts';
 
 export const FPS = 30;
 export const LARGURA = 1920;
@@ -57,11 +58,11 @@ export const tempoCardsC4 = (): number[] => {
 export const montagemC4 = (): {t: number; nome: string; inicio?: number; tratamento?: 'duotone' | 'luz'}[] => {
   const base = inicioCena(3), c = tempoCardsC4(), R = MUSICA.corteRiser;
   return [
-    {t: base, nome: 'sala_controle', inicio: 4}, {t: base + 1.5, nome: 'escritorio_equipe', inicio: 6},
-    {t: c[0], nome: 'reuniao', inicio: 2}, {t: c[1], nome: 'normas', inicio: 1},
-    {t: c[2], nome: 'sistema', inicio: 3}, {t: c[3], nome: 'workshop_planejamento', inicio: 2},
+    {t: base, nome: 'hidreletrica_aerea', inicio: 2}, {t: base + 1.5, nome: 'torres_campo', inicio: 3},
+    {t: c[0], nome: 'industria_noite', inicio: 1}, {t: c[1], nome: 'postes_contraluz', inicio: 2},
+    {t: c[2], nome: 'datacenter_cabos', inicio: 3}, {t: c[3], nome: 'cidade_transito_noite', inicio: 4},
     {t: R - 1.5, nome: 'cidade_noite_aerea', inicio: 3}, {t: R - 1.0, nome: 'fluorescente_falhando', inicio: 2, tratamento: 'luz'},
-    {t: R - 0.5, nome: 'filamento_falhando', inicio: 1, tratamento: 'luz'}, {t: R - 0.25, nome: 'raios_noite', inicio: 3, tratamento: 'luz'},
+    {t: R - 0.5, nome: 'filamento_falhando', inicio: 1, tratamento: 'luz'}, {t: R - 0.25, nome: 'raios_noite', inicio: 3.75, tratamento: 'luz'},
   ];
 };
 // Cena 5: logo depois do drop, montagem rápida de lâmpadas acendendo (no ritmo, em semicolcheias)
@@ -69,16 +70,56 @@ export const lampadasC5 = (): {t: number; nome: string; inicio: number}[] => [
   {t: MUSICA.drop + 0.5, nome: 'lampada_interruptor', inicio: 2.2},
   {t: MUSICA.drop + 0.75, nome: 'tres_lampadas', inicio: 6},
   {t: MUSICA.drop + 1.0, nome: 'lampada_acendendo', inicio: 4},
-  {t: MUSICA.drop + 1.25, nome: 'bola_energia', inicio: 3},
+  {t: MUSICA.drop + 1.25, nome: 'esfera_eletrica', inicio: 3},
 ];
 export const FIM_LAMPADAS_C5 = MUSICA.drop + 1.75;
 // Cena 5: silhuetas acendem uma a uma, em colcheias, logo depois do drop
 export const N_SILHUETAS = 9;
 export const tempoSilhuetasC5 = (): number[] => Array.from({length: N_SILHUETAS}, (_, k) => FIM_LAMPADAS_C5 + 0.25 + k * 0.25);
 
+// Cena 1: 0,5 s de preto; pulsos na linha
+export const PRETO_C1 = 0.5;
+export const pulsosC1 = (): number[] => [1.5, 4.25];
+// Cena 2: carga acende (casa, indústria, hospital) no ritmo da fala
+export const cargasC2 = (): number[] => {
+  const base = inicioCena(1), fr = frasesCena(1)[1];
+  return [0, 1, 2].map((k) => naBatida(base + fr.ini + k * ((fr.fim - fr.ini) / 3), 2));
+};
+// Cena 3: checks do card
+export const checksC3 = (): number[] => [1, 2, 3].map((k) => inicioCena(2) + frasesCena(2)[k].ini + 0.3);
+// Cena 6: cada nome acende no ritmo (grade de 0,25 s) depois que a fala cita a frente
+export const tempoNomesC6 = (): number[] => {
+  const base = inicioCena(5), fr = frasesCena(5);
+  const fs = frentes();
+  const out: number[] = [];
+  fs.forEach((f, g) => {
+    const ini = fr[g + 1] ? fr[g + 1].ini : fr[0].fim + g;
+    participantes.filter((p) => p.frente === f).forEach((_, k) => out.push(naBatida(base + ini + 0.25 + k * 0.25, 2)));
+  });
+  return out;
+};
+// Cena 7: cada marco se destaca na palavra correspondente
+export const marcosC7 = (): number[] => [1, 2, 3, 4].map((k) => naBatida(inicioCena(6) + frasesCena(6)[k].ini, 2));
+
 // ---------- efeitos sonoros (assets/sfx/*.wav), em tempo global ----------
-export type Som = {t: number; arquivo: string; db?: number};
+export type Som = {t: number; arquivo: string; db?: number; dur?: number};
 export const SONS = (): Som[] => [
+  // Cena 1: zumbido grave crescendo no preto; disjuntor no primeiro frame de imagem; whoosh com o pulso
+  {t: 0, arquivo: 'zumbido_grave.wav', db: -8, dur: PRETO_C1 + 0.15},
+  {t: PRETO_C1, arquivo: 'disjuntor.wav', db: -2},
+  ...pulsosC1().map((t) => ({t, arquivo: 'whoosh_eletrico.wav', db: -9})),
+  // Cena 2: um clique de luz por bloco que acende
+  ...cargasC2().map((t) => ({t, arquivo: 'clique_luz.wav', db: -6})),
+  // Cena 3: ticks nos checks; luz falhando na falha do pulso
+  ...checksC3().map((t) => ({t, arquivo: 'clique_luz.wav', db: -14})),
+  {t: inicioCena(2) + MARCAS.falhaC3, arquivo: 'luz_falhando.wav', db: -6},
+  // Cena 6: cada nome que acende tem um clique de luz suave
+  ...tempoNomesC6().map((t) => ({t, arquivo: 'clique_luz.wav', db: -15})),
+  // Cena 7: whoosh a cada marco
+  ...marcosC7().map((t) => ({t: t - 0.1, arquivo: 'whoosh_curto.wav', db: -10})),
+  // Cena 8: power-up grande em "Agora é fazer chegar"; zumbido some no último frame
+  {t: naBatida(inicioCena(7) + frasesCena(7)[1].ini) - 0.05, arquivo: 'powerup_grande.wav', db: -4},
+  {t: DURACAO_TOTAL - 6, arquivo: 'zumbido_grave.wav', db: -24, dur: 6},
   // Cena 4: whoosh curto em cada card; riser até o corte seco
   ...tempoCardsC4().map((t) => ({t: t - 0.05, arquivo: 'whoosh_curto.wav', db: -8})),
   {t: MUSICA.corteRiser - 9.6, arquivo: 'riser.wav', db: -6},
@@ -107,49 +148,49 @@ export const CENAS: Cena[] = [
     id: 'Cena01',
     titulo: 'A energia',
     duracao: 7,
-    still: 4.0,
+    still: 3.0,
     loc: 'Todos os dias, a energia percorre milhares de quilômetros pelo Sistema Interligado Nacional.',
   },
   {
     id: 'Cena02',
     titulo: 'Só vira valor quando chega',
     duracao: 7,
-    still: 6.5,
+    still: 5.2,
     loc: 'E ela só vira valor quando chega à carga. Na casa, na indústria, no hospital.',
   },
   {
     id: 'Cena03',
     titulo: 'Projeto entregue. Resultado?',
     duracao: 14,
-    still: 13.4,
+    still: 12.8,
     loc: 'Com projetos acontece o mesmo. A solução fica pronta. O sistema entra no ar. O projeto é entregue. Mas, se as pessoas continuam trabalhando do jeito antigo, o resultado não chega.',
   },
   {
     id: 'Cena04',
     titulo: 'Tudo ao mesmo tempo',
     duracao: 10,
-    still: 9.6,
+    still: 8.8,
     loc: 'E no ONS as mudanças não chegam uma de cada vez. Reorganizações, novas regras do setor, novos sistemas, novas formas de trabalhar. Tudo ao mesmo tempo.',
   },
   {
     id: 'Cena05',
     titulo: 'A virada: a transmissão',
     duracao: 14,
-    still: 13.0,
+    still: 10.5,
     loc: 'Nenhum projeto termina no go-live. Ele termina no dia em que as pessoas deixam de trabalhar do jeito antigo. A gestão da mudança é a transmissão: o que leva a solução até as pessoas.',
   },
   {
     id: 'Cena06',
     titulo: 'Vocês são a rede',
     duracao: 16,
-    still: 15.4,
+    still: 15.2,
     loc: 'E toda transmissão precisa de uma rede. Gestão de Pessoas. Inovação e Transformação. Comunicação Interna. Relacionamento com Agentes. Quatro frentes, uma mesma rede.',
   },
   {
     id: 'Cena07',
     titulo: 'A jornada',
     duracao: 16,
-    still: 15.4,
+    still: 14.5,
     loc: 'Nos próximos três dias, vocês saem do lugar de quem vive a mudança para o lugar de quem conduz. Entender. Conduzir. Construir. E, depois, multiplicar.',
   },
   {
