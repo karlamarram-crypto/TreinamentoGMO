@@ -41,7 +41,7 @@ export const layoutSala = (): LayoutSala => {
     const vao = as.length > 1 ? (AREA.x1 - AREA.x0 - soma) / (as.length - 1) : 0;
     if (vao < 28) continue;
     // aberto: colunas espalhadas pela tela; junto: colunas encostadas e centralizadas (a "sala")
-    const vaoJunto = 44;
+    const vaoJunto = 26;
     const blocoL = soma + vaoJunto * (as.length - 1);
     const blocoX = (AREA.x0 + AREA.x1) / 2 - blocoL / 2;
     let xa = AREA.x0, xj = blocoX;
@@ -74,8 +74,11 @@ export const Sala: React.FC<{t: number; L: LayoutSala; tNomes: number[]; tRotulo
   const mold = prog(t, tMoldura, 0.8);
   const pad = 40;
   const mx = L.blocoX - pad, my = AREA.yRotulo - 44, mw = L.blocoL + pad * 2, mh = yFim - my + 52;
+  // ao se juntar, o bloco também se fecha no centro (escala), para o movimento ficar claro
+  const escala = lerp(1, 0.84, junta); // nomes nunca abaixo de 20 px
+  const cy = (my + my + mh) / 2;
   return (
-    <>
+    <div style={{position: 'absolute', inset: 0, transform: `scale(${escala})`, transformOrigin: `960px ${cy}px`}}>
       {mold > 0 && (
         <Svg>
           <rect x={mx} y={my} width={mw} height={mh} rx={6} fill={CORES.marinho2} fillOpacity={0.28 * mold} />
@@ -108,7 +111,7 @@ export const Sala: React.FC<{t: number; L: LayoutSala; tNomes: number[]; tRotulo
           </div>
         );
       })}
-    </>
+    </div>
   );
 };
 
