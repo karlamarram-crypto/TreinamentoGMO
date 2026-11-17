@@ -1,5 +1,5 @@
 import React from 'react';
-import {CORES, FONTE, frasesCena, inicioCena, tempoNomesC6} from '../config';
+import {CORES, FONTE, inicioCena, juntaC6, tempoNomesC6} from '../config';
 import {participantes, areas} from '../data/participantes';
 import {Fundo, Linha, Rotulo, Silhueta, Svg, Texto, diagonal, ease, lerp, prog, useT} from '../componentes/base';
 import {Montagem} from '../componentes/imagens';
@@ -34,8 +34,7 @@ export const layoutSala = (): LayoutSala => {
     const g0 = as.map((a, g) => {
       const cols = Math.ceil(membros[g].length / maxLinhas);
       const larNome = Math.max(...membros[g].map((p) => medir(p.nome, fonteNome)));
-      const larRotulo = medir(a.toUpperCase(), fonteRotulo, 0.25) + 54;
-      return {nome: a, cols, larNome, largura: Math.max(larRotulo, cols * larNome + (cols - 1) * 28)};
+      return {nome: a, cols, larNome, largura: cols * larNome + (cols - 1) * 28};
     });
     const soma = g0.reduce((s, g) => s + g.largura, 0);
     const vao = as.length > 1 ? (AREA.x1 - AREA.x0 - soma) / (as.length - 1) : 0;
@@ -73,7 +72,7 @@ export const Sala: React.FC<{t: number; L: LayoutSala; tNomes: number[]; tRotulo
   const yFim = AREA.yNomes + (L.linhas - 1) * L.linhaH;
   const mold = prog(t, tMoldura, 0.8);
   const pad = 40;
-  const mx = L.blocoX - pad, my = AREA.yRotulo - 44, mw = L.blocoL + pad * 2, mh = yFim - my + 52;
+  const mx = L.blocoX - pad, my = AREA.yNomes - 52, mw = L.blocoL + pad * 2, mh = yFim - my + 52;
   // ao se juntar, o bloco também se fecha no centro (escala), para o movimento ficar claro
   const escala = lerp(1, 0.84, junta); // nomes nunca abaixo de 20 px
   const cy = (my + my + mh) / 2;
@@ -86,11 +85,6 @@ export const Sala: React.FC<{t: number; L: LayoutSala; tNomes: number[]; tRotulo
             strokeDasharray={`${2 * (mw + mh)}`} strokeDashoffset={2 * (mw + mh) * (1 - mold)} />
         </Svg>
       )}
-      {L.grupos.map((g, gi) => (
-        <div key={g.nome} style={{position: 'absolute', left: 0, top: 0, transform: `translateX(${xG(gi) - g.xAberto}px)`}}>
-          <Rotulo texto={g.nome} x={g.xAberto} y={AREA.yRotulo} p={prog(t, tRotulos[gi], 0.45)} tamanho={L.fonteRotulo} cor={CORES.cinzaClaro} />
-        </div>
-      ))}
       {L.nomes.map((n) => {
         const t0 = tNomes[n.ordem];
         const p = prog(t, t0, 0.25);
@@ -117,11 +111,10 @@ export const Sala: React.FC<{t: number; L: LayoutSala; tNomes: number[]; tRotulo
 
 export const temposSala = () => {
   const base = inicioCena(5);
-  const fr = frasesCena(5);
   const L = layoutSala();
   const tNomes = tempoNomesC6().map((x) => x - base);
-  const tRotulos = L.grupos.map((_, g) => (fr[g + 1] ? fr[g + 1].ini : fr[0].fim + g));
-  const tJunta = fr[fr.length - 1].ini; // "Olhares diferentes, na mesma sala."
+  const tRotulos = L.grupos.map(() => 0);
+  const tJunta = juntaC6();
   return {L, tNomes, tRotulos, tJunta};
 };
 
@@ -144,7 +137,7 @@ export const Cena06: React.FC = () => {
       </Svg>
       <Sala t={t} L={L} tNomes={tNomes} tRotulos={tRotulos} junta={junta} tMoldura={tJunta + 0.7} />
       <Texto x={960} y={790} alinhar="centro" largura={1600} p={prog(t, tJunta + 0.9, 0.5)} estilo={{fontSize: 50}}>
-        {participantes.length} participantes. {L.grupos.length} áreas. <span style={{color: CORES.aco}}>Três dias juntos.</span>
+        {participantes.length} participantes. <span style={{color: CORES.aco}}>Três dias juntos.</span>
       </Texto>
     </Fundo>
   );

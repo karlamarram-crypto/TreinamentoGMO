@@ -95,31 +95,15 @@ export const LOCUCAO: Record<string, TrechoLocucao> = {
   "Cena06": {
     "arquivo": "locucao/rapida/cena06.mp3",
     "inicio": 0.25,
-    "duracao": 10.109,
+    "duracao": 4.519,
     "frases": [
       [
         0.25,
-        1.988
+        2.059
       ],
       [
-        2.216,
-        3.328
-      ],
-      [
-        3.515,
-        5.025
-      ],
-      [
-        5.259,
-        6.339
-      ],
-      [
-        6.567,
-        7.995
-      ],
-      [
-        8.179,
-        10.2
+        2.269,
+        4.622
       ]
     ]
   },

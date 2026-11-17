@@ -5,7 +5,7 @@
 // v2: ~20% mais rápido (1:38), locução 1,2x, trilha 120 BPM com drop na reconexão (0:45).
 // =============================================================================
 import {LOCUCAO} from './locucao.ts';
-import {participantes, areas} from './data/participantes.ts';
+import {participantes} from './data/participantes.ts';
 
 export const FPS = 30;
 export const LARGURA = 1920;
@@ -87,21 +87,14 @@ export const cargasC2 = (): number[] => {
 };
 // Cena 3: checks do card
 export const checksC3 = (): number[] => [1, 2, 3].map((k) => inicioCena(2) + frasesCena(2)[k].ini + 0.3);
-// Cena 6: cada nome acende no ritmo (grade de 0,25 s) depois que a fala cita a área
+// Cena 6: os nomes acendem um por vez, na batida (0,5 s), a partir da 2ª frase
 export const tempoNomesC6 = (): number[] => {
   const base = inicioCena(5), fr = frasesCena(5);
-  const as = areas();
-  const out: number[] = [];
-  as.forEach((a, g) => {
-    const ini = fr[g + 1] ? fr[g + 1].ini : fr[0].fim + g;
-    participantes.filter((p) => p.area === a).forEach((_, k) => {
-      // um nome por vez: nunca dois cliques no mesmo instante
-      const t = naBatida(base + ini + 0.25 + k * 0.25, 2);
-      out.push(out.length ? Math.max(t, out[out.length - 1] + 0.25) : t);
-    });
-  });
-  return out;
+  const ini = naBatida(base + (fr[1] ? fr[1].ini : fr[0].fim + 0.3));
+  return participantes.map((_, k) => ini + k * BATIDA);
 };
+// Cena 6: as colunas se juntam na sala depois do último nome
+export const juntaC6 = (): number => tempoNomesC6()[participantes.length - 1] + 0.75 - inicioCena(5);
 // Cena 7: cada marco se destaca na palavra correspondente
 export const marcosC7 = (): number[] => [1, 2, 3, 4].map((k) => naBatida(inicioCena(6) + frasesCena(6)[k].ini, 2));
 
@@ -183,7 +176,7 @@ export const CENAS: Cena[] = [
     titulo: 'Juntos na mesma sala',
     duracao: 16,
     still: 15.2,
-    loc: 'E é isso que vamos aprender juntos. Gestão de Pessoas. Inovação e Transformação. Comunicação Interna. Relacionamento com Agentes. Olhares diferentes, na mesma sala.',
+    loc: 'E é isso que vamos aprender juntos. Pessoas de áreas diferentes, na mesma sala.',
   },
   {
     id: 'Cena07',
