@@ -156,9 +156,8 @@ export const Cena06: React.FC = () => {
   const nFrentes = L.grupos.length;
   return (
     <Fundo>
-      <AbsoluteFill style={{opacity: 0.22}}>
-        <Montagem planos={[{t: 0, nome: 'linhas_transmissao_noite', inicio: 0, corte: true}, {t: 8, nome: 'torres_silhueta', inicio: 2}]} fim={16} veu={0.2} />
-      </AbsoluteFill>
+      {/* linhas de transmissão ao fundo, bem discretas (véu marinho forte em vez de opacidade) */}
+      <Montagem planos={[{t: 0, nome: 'linhas_transmissao_noite', inicio: 0, corte: true}, {t: 8, nome: 'torres_silhueta', inicio: 2}]} fim={16} veu={0.8} />
       <Svg>
         <Linha {...diagonal(-80)} p={prog(t, 0.4, 2)} largura={1} opacidade={0.18} />
         <Linha {...diagonal(1560)} p={prog(t, 0.6, 2)} largura={1} opacidade={0.18} />
