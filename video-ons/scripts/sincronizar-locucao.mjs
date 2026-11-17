@@ -8,16 +8,19 @@ import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const {CENAS, frasesDe} = await import(path.join(RAIZ, 'src/config.ts'));
-const OFFSET = 0.5; // segundos entre o início da cena e o início da fala
+const {CENAS, frasesDe, AUDIO} = await import(path.join(RAIZ, 'src/config.ts'));
+// segundos entre o início da cena e o início da fala (Cena 1 abre com 0,5 s de preto)
+const OFFSETS = {Cena01: 0.9, Cena05: 0.3};
+const OFFSET_PADRAO = 0.25;
 
 const saida = {};
 for (const [i, c] of CENAS.entries()) {
-  const arq = `locucao/cena${String(i + 1).padStart(2, '0')}.mp3`;
+  const arq = `${AUDIO.locucaoDir}/cena${String(i + 1).padStart(2, '0')}.mp3`;
+  const OFFSET = OFFSETS[c.id] ?? OFFSET_PADRAO;
   const f = path.join(RAIZ, 'assets', arq);
   if (!fs.existsSync(f)) continue;
   const dur = parseFloat(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f]).toString());
-  const log = execFileSync('sh', ['-c', `ffmpeg -hide_banner -i "${f}" -af silencedetect=noise=-38dB:d=0.15 -f null - 2>&1`]).toString();
+  const log = execFileSync('sh', ['-c', `ffmpeg -hide_banner -i "${f}" -af silencedetect=noise=-36dB:d=0.08 -f null - 2>&1`]).toString();
   const pausas = [];
   let ini = null;
   for (const l of log.split('\n')) {
@@ -33,7 +36,7 @@ for (const [i, c] of CENAS.entries()) {
   const frases = frasesDe(c.loc);
   // para cada fronteira entre frases, a pausa mais próxima de onde ela deveria cair
   // (posição esperada pelo tamanho do texto), dando preferência às pausas mais longas
-  const pesos = frases.map((fr) => fr.length + 6);
+  const pesos = frases.map((fr) => fr.length + 14);
   const total = pesos.reduce((a, b) => a + b, 0);
   const cortes = [];
   let acc = 0, depoisDe = 0;

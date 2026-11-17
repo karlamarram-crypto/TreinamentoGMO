@@ -2,170 +2,170 @@
 export type TrechoLocucao = {arquivo: string; inicio: number; duracao: number; frases: [number, number][]};
 export const LOCUCAO: Record<string, TrechoLocucao> = {
   "Cena01": {
-    "arquivo": "locucao/cena01.mp3",
-    "inicio": 0.5,
-    "duracao": 6.113,
+    "arquivo": "locucao/rapida/cena01.mp3",
+    "inicio": 0.9,
+    "duracao": 5.12,
     "frases": [
       [
-        0.5,
-        6.367
+        0.9,
+        5.784
       ]
     ]
   },
   "Cena02": {
-    "arquivo": "locucao/cena02.mp3",
-    "inicio": 0.5,
-    "duracao": 5.721,
+    "arquivo": "locucao/rapida/cena02.mp3",
+    "inicio": 0.25,
+    "duracao": 4.78,
     "frases": [
       [
-        0.5,
-        3.116
+        0.25,
+        2.435
       ],
       [
-        3.448,
-        5.961
+        2.701,
+        4.795
       ]
     ]
   },
   "Cena03": {
-    "arquivo": "locucao/cena03.mp3",
-    "inicio": 0.5,
-    "duracao": 12.826,
+    "arquivo": "locucao/rapida/cena03.mp3",
+    "inicio": 0.25,
+    "duracao": 10.736,
     "frases": [
       [
-        0.5,
-        2.367
+        0.25,
+        1.81
       ],
       [
-        2.791,
-        4.102
+        2.166,
+        3.253
       ],
       [
-        4.454,
-        5.93
+        3.538,
+        4.768
       ],
       [
-        6.258,
-        7.435
+        5.047,
+        6.407
       ],
       [
-        7.678,
-        13.075
+        6.583,
+        10.986
       ]
     ]
   },
   "Cena04": {
-    "arquivo": "locucao/cena04.mp3",
-    "inicio": 0.5,
-    "duracao": 11.546,
+    "arquivo": "locucao/rapida/cena04.mp3",
+    "inicio": 0.25,
+    "duracao": 9.665,
     "frases": [
       [
-        0.5,
-        4.141
+        0.25,
+        3.272
       ],
       [
-        4.33,
-        10.075
+        3.639,
+        8.242
       ],
       [
-        10.586,
-        11.82
+        8.65,
+        9.915
       ]
     ]
   },
   "Cena05": {
-    "arquivo": "locucao/cena05.mp3",
-    "inicio": 0.5,
-    "duracao": 12.748,
+    "arquivo": "locucao/rapida/cena05.mp3",
+    "inicio": 0.3,
+    "duracao": 10.658,
     "frases": [
       [
-        0.5,
-        2.858
+        0.3,
+        2.277
       ],
       [
-        3.227,
-        7.065
+        2.59,
+        5.774
       ],
       [
-        7.428,
-        13.248
+        6.091,
+        10.83
       ]
     ]
   },
   "Cena06": {
-    "arquivo": "locucao/cena06.mp3",
-    "inicio": 0.5,
-    "duracao": 12.591,
+    "arquivo": "locucao/rapida/cena06.mp3",
+    "inicio": 0.25,
+    "duracao": 10.527,
     "frases": [
       [
-        0.5,
-        2.89
+        0.25,
+        2.243
       ],
       [
-        3.363,
-        4.743
+        2.633,
+        3.761
       ],
       [
-        4.922,
-        6.865
+        3.934,
+        5.559
       ],
       [
-        7.071,
-        8.364
+        5.728,
+        6.8
       ],
       [
-        8.568,
-        10.264
+        6.982,
+        8.377
       ],
       [
-        10.574,
-        12.891
+        8.65,
+        10.578
       ]
     ]
   },
   "Cena07": {
-    "arquivo": "locucao/cena07.mp3",
-    "inicio": 0.5,
-    "duracao": 12.591,
+    "arquivo": "locucao/rapida/cena07.mp3",
+    "inicio": 0.25,
+    "duracao": 10.501,
     "frases": [
       [
-        0.5,
-        6.751
+        0.25,
+        5.47
       ],
       [
-        7.226,
-        7.933
+        5.863,
+        6.449
       ],
       [
-        8.35,
-        9.068
+        6.792,
+        7.405
       ],
       [
-        9.465,
-        10.195
+        7.721,
+        8.303
       ],
       [
-        10.685,
-        12.869
+        8.74,
+        10.559
       ]
     ]
   },
   "Cena08": {
-    "arquivo": "locucao/cena08.mp3",
-    "inicio": 0.5,
-    "duracao": 7.001,
+    "arquivo": "locucao/rapida/cena08.mp3",
+    "inicio": 0.25,
+    "duracao": 5.851,
     "frases": [
       [
-        0.5,
-        2.213
+        0.25,
+        1.666
       ],
       [
-        2.516,
-        4.286
+        1.919,
+        3.414
       ],
       [
-        4.713,
-        7.501
+        3.752,
+        5.939
       ]
     ]
   }
