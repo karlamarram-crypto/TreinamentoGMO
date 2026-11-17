@@ -1,5 +1,6 @@
 import React from 'react';
-import {AbsoluteFill, Audio, Series, interpolate, staticFile, useVideoConfig} from 'remotion';
+import {AbsoluteFill, Audio, Sequence, Series, interpolate, staticFile, useVideoConfig} from 'remotion';
+import {LOCUCAO} from './locucao.ts';
 import {AUDIO, CENAS, CORES, DURACAO_TOTAL, quadros} from './config';
 import {Legendas} from './componentes/Legendas';
 import {Cena01} from './cenas/Cena01';
@@ -27,6 +28,12 @@ export const Video: React.FC<PropsVideo> = ({temLocucao, temTrilha, legendas}) =
           return (
             <Series.Sequence key={c.id} durationInFrames={quadros(c.duracao)} name={`${c.id} · ${c.titulo}`}>
               <Comp />
+              {/* locução da cena (assets/locucao/cenaXX.mp3) */}
+              {LOCUCAO[c.id] && (
+                <Sequence from={quadros(LOCUCAO[c.id].inicio)} layout="none">
+                  <Audio src={staticFile(LOCUCAO[c.id].arquivo)} />
+                </Sequence>
+              )}
             </Series.Sequence>
           );
         })}
@@ -40,7 +47,7 @@ export const Video: React.FC<PropsVideo> = ({temLocucao, temTrilha, legendas}) =
           volume={(f) =>
             interpolate(f, [0, AUDIO.fadeInTrilha * fps, fim - AUDIO.fadeOutTrilha * fps, fim], [0, 1, 1, 0], {
               extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
-            }) * (temLocucao ? ganhoTrilha : 1)
+            }) * (temLocucao || Object.keys(LOCUCAO).length ? ganhoTrilha : 1)
           }
         />
       )}

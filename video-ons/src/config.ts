@@ -3,6 +3,7 @@
 // Fonte da verdade de tempos, cores e fontes.
 // Para ressincronizar com a locução, ajuste "duracao" de cada cena (em segundos).
 // =============================================================================
+import {LOCUCAO} from './locucao.ts';
 
 export const FPS = 30;
 export const LARGURA = 1920;
@@ -87,15 +88,15 @@ export const CENAS: Cena[] = [
   {
     id: 'Cena06',
     titulo: 'Vocês são a rede',
-    duracao: 20,
-    still: 19.0,
+    duracao: 17,
+    still: 16.0,
     loc: 'E toda transmissão precisa de uma rede. Gestão de Pessoas. Inovação e Transformação. Comunicação Interna. Relacionamento com Agentes. Quatro frentes, uma mesma rede.',
   },
   {
     id: 'Cena07',
     titulo: 'A jornada',
-    duracao: 20,
-    still: 19.0,
+    duracao: 17,
+    still: 16.0,
     loc: 'Nos próximos três dias, vocês saem do lugar de quem vive a mudança para o lugar de quem conduz. Entender. Conduzir. Construir. E, depois, multiplicar.',
   },
   {
@@ -114,13 +115,22 @@ export const inicioCena = (i: number) => CENAS.slice(0, i).reduce((a, c) => a + 
 export const DURACAO_TOTAL = CENAS.reduce((a, c) => a + c.duracao, 0);
 
 // Frases da locução de uma cena, com início/fim locais (s), distribuídas pelo tamanho do texto.
-// Sem locução gravada, é isso que comanda legendas e animações sincronizadas.
+// Com locução (assets/locucao/cenaXX.mp3 + scripts/sincronizar-locucao.mjs), usa os tempos reais.
 export type Frase = {texto: string; ini: number; fim: number};
 export const frasesDe = (texto: string) => texto.split(/(?<=[.?!])\s+/).filter(Boolean);
 
 export const frasesCena = (i: number): Frase[] => {
   const c = CENAS[i];
   const fr = frasesDe(c.loc);
+  // com locução gravada: tempos reais de cada frase (src/locucao.ts)
+  const real = LOCUCAO[c.id];
+  if (real && real.frases.length === fr.length) {
+    return fr.map((texto, k) => {
+      const prox = real.frases[k + 1];
+      const fim = Math.min(prox ? prox[0] : c.duracao - (c.fimLegenda ?? 0.3), real.frases[k][1] + 0.6);
+      return {texto, ini: real.frases[k][0], fim};
+    });
+  }
   const ini = 0.35;
   const fim = c.duracao - (c.fimLegenda ?? 0.4);
   const pesos = fr.map((f) => f.length + 10);

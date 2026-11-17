@@ -1,0 +1,172 @@
+// Gerado por scripts/sincronizar-locucao.mjs a partir de assets/locucao/*.mp3. Não edite à mão.
+export type TrechoLocucao = {arquivo: string; inicio: number; duracao: number; frases: [number, number][]};
+export const LOCUCAO: Record<string, TrechoLocucao> = {
+  "Cena01": {
+    "arquivo": "locucao/cena01.mp3",
+    "inicio": 0.5,
+    "duracao": 6.113,
+    "frases": [
+      [
+        0.5,
+        6.367
+      ]
+    ]
+  },
+  "Cena02": {
+    "arquivo": "locucao/cena02.mp3",
+    "inicio": 0.5,
+    "duracao": 5.721,
+    "frases": [
+      [
+        0.5,
+        3.116
+      ],
+      [
+        3.448,
+        5.961
+      ]
+    ]
+  },
+  "Cena03": {
+    "arquivo": "locucao/cena03.mp3",
+    "inicio": 0.5,
+    "duracao": 12.826,
+    "frases": [
+      [
+        0.5,
+        2.367
+      ],
+      [
+        2.791,
+        4.102
+      ],
+      [
+        4.454,
+        5.93
+      ],
+      [
+        6.258,
+        7.435
+      ],
+      [
+        7.678,
+        13.075
+      ]
+    ]
+  },
+  "Cena04": {
+    "arquivo": "locucao/cena04.mp3",
+    "inicio": 0.5,
+    "duracao": 11.546,
+    "frases": [
+      [
+        0.5,
+        4.141
+      ],
+      [
+        4.33,
+        10.075
+      ],
+      [
+        10.586,
+        11.82
+      ]
+    ]
+  },
+  "Cena05": {
+    "arquivo": "locucao/cena05.mp3",
+    "inicio": 0.5,
+    "duracao": 12.748,
+    "frases": [
+      [
+        0.5,
+        2.858
+      ],
+      [
+        3.227,
+        7.065
+      ],
+      [
+        7.428,
+        13.248
+      ]
+    ]
+  },
+  "Cena06": {
+    "arquivo": "locucao/cena06.mp3",
+    "inicio": 0.5,
+    "duracao": 12.591,
+    "frases": [
+      [
+        0.5,
+        2.89
+      ],
+      [
+        3.363,
+        4.743
+      ],
+      [
+        4.922,
+        6.865
+      ],
+      [
+        7.071,
+        8.364
+      ],
+      [
+        8.568,
+        10.264
+      ],
+      [
+        10.574,
+        12.891
+      ]
+    ]
+  },
+  "Cena07": {
+    "arquivo": "locucao/cena07.mp3",
+    "inicio": 0.5,
+    "duracao": 12.591,
+    "frases": [
+      [
+        0.5,
+        6.751
+      ],
+      [
+        7.226,
+        7.933
+      ],
+      [
+        8.35,
+        9.068
+      ],
+      [
+        9.465,
+        10.195
+      ],
+      [
+        10.685,
+        12.869
+      ]
+    ]
+  },
+  "Cena08": {
+    "arquivo": "locucao/cena08.mp3",
+    "inicio": 0.5,
+    "duracao": 7.001,
+    "frases": [
+      [
+        0.5,
+        2.213
+      ],
+      [
+        2.516,
+        4.286
+      ],
+      [
+        4.713,
+        7.501
+      ]
+    ]
+  }
+};
