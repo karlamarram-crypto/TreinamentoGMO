@@ -5,7 +5,7 @@
 // v2: ~20% mais rápido (1:38), locução 1,2x, trilha 120 BPM com drop na reconexão (0:45).
 // =============================================================================
 import {LOCUCAO} from './locucao.ts';
-import {participantes, frentes} from './data/participantes.ts';
+import {participantes, areas} from './data/participantes.ts';
 
 export const FPS = 30;
 export const LARGURA = 1920;
@@ -87,46 +87,41 @@ export const cargasC2 = (): number[] => {
 };
 // Cena 3: checks do card
 export const checksC3 = (): number[] => [1, 2, 3].map((k) => inicioCena(2) + frasesCena(2)[k].ini + 0.3);
-// Cena 6: cada nome acende no ritmo (grade de 0,25 s) depois que a fala cita a frente
+// Cena 6: cada nome acende no ritmo (grade de 0,25 s) depois que a fala cita a área
 export const tempoNomesC6 = (): number[] => {
   const base = inicioCena(5), fr = frasesCena(5);
-  const fs = frentes();
+  const as = areas();
   const out: number[] = [];
-  fs.forEach((f, g) => {
+  as.forEach((a, g) => {
     const ini = fr[g + 1] ? fr[g + 1].ini : fr[0].fim + g;
-    participantes.filter((p) => p.frente === f).forEach((_, k) => out.push(naBatida(base + ini + 0.25 + k * 0.25, 2)));
+    participantes.filter((p) => p.area === a).forEach((_, k) => out.push(naBatida(base + ini + 0.25 + k * 0.25, 2)));
   });
   return out;
 };
 // Cena 7: cada marco se destaca na palavra correspondente
 export const marcosC7 = (): number[] => [1, 2, 3, 4].map((k) => naBatida(inicioCena(6) + frasesCena(6)[k].ini, 2));
 
-// ---------- efeitos sonoros (assets/sfx/*.wav), em tempo global ----------
-export type Som = {t: number; arquivo: string; db?: number; dur?: number};
+// ---------- efeitos sonoros: só os 4 arquivos de assets/sfx/ (tempo global) ----------
+// Todos abaixo da trilha, com fade de 60 a 100 ms nas bordas (aplicado no Video.tsx).
+// tom = variação de altura (toneFrequency do Remotion), para os cliques dos nomes não soarem repetidos.
+export type Som = {t: number; arquivo: string; db?: number; dur?: number; tom?: number; onde?: string};
+export const SFX = {
+  zumbido: 'zumbido_abertura.mp3',
+  clique: 'clique_luz.mp3',
+  whoosh: 'whoosh.mp3',
+  powerup: 'powerup_drop.mp3',
+};
+// o estalo do powerup_drop.mp3 acontece ~0,40 s depois do início do arquivo
+const ATAQUE_POWERUP = 0.4;
 export const SONS = (): Som[] => [
-  // Cena 1: zumbido grave crescendo no preto; disjuntor no primeiro frame de imagem; whoosh com o pulso
-  {t: 0, arquivo: 'zumbido_grave.wav', db: -8, dur: PRETO_C1 + 0.15},
-  {t: PRETO_C1, arquivo: 'disjuntor.wav', db: -2},
-  ...pulsosC1().map((t) => ({t, arquivo: 'whoosh_eletrico.wav', db: -9})),
-  // Cena 2: um clique de luz por bloco que acende
-  ...cargasC2().map((t) => ({t, arquivo: 'clique_luz.wav', db: -6})),
-  // Cena 3: ticks nos checks; luz falhando na falha do pulso
-  ...checksC3().map((t) => ({t, arquivo: 'clique_luz.wav', db: -14})),
-  {t: inicioCena(2) + MARCAS.falhaC3, arquivo: 'luz_falhando.wav', db: -6},
-  // Cena 6: cada nome que acende tem um clique de luz suave
-  ...tempoNomesC6().map((t) => ({t, arquivo: 'clique_luz.wav', db: -15})),
-  // Cena 7: whoosh a cada marco
-  ...marcosC7().map((t) => ({t: t - 0.1, arquivo: 'whoosh_curto.wav', db: -10})),
-  // Cena 8: power-up grande em "Agora é fazer chegar"; zumbido some no último frame
-  {t: naBatida(inicioCena(7) + frasesCena(7)[1].ini) - 0.05, arquivo: 'powerup_grande.wav', db: -4},
-  {t: DURACAO_TOTAL - 6, arquivo: 'zumbido_grave.wav', db: -24, dur: 6},
-  // Cena 4: whoosh curto em cada card; riser até o corte seco
-  ...tempoCardsC4().map((t) => ({t: t - 0.05, arquivo: 'whoosh_curto.wav', db: -8})),
-  {t: MUSICA.corteRiser - 9.6, arquivo: 'riser.wav', db: -6},
-  // Cena 5: na reconexão, estalo forte + power-up; um clique por silhueta que acende
-  {t: MUSICA.drop - 0.04, arquivo: 'estalo_powerup.wav', db: -3},
-  ...lampadasC5().map((l) => ({t: l.t, arquivo: 'clique_luz.wav', db: -5})),
-  ...tempoSilhuetasC5().map((t) => ({t, arquivo: 'clique_luz.wav', db: -9})),
+  {t: 0, arquivo: SFX.zumbido, db: -16, onde: 'Cena 1 · abertura'},
+  ...cargasC2().map((t, k) => ({t, arquivo: SFX.clique, db: -15, onde: `Cena 2 · ${['casa', 'indústria', 'hospital'][k]} acende`})),
+  ...tempoCardsC4().map((t, k) => ({t: t - 0.08, arquivo: SFX.whoosh, db: -17, onde: `Cena 4 · card ${k + 1}`})),
+  {t: MUSICA.drop - ATAQUE_POWERUP, arquivo: SFX.powerup, db: -13, onde: 'Cena 5 · reconexão (drop)'},
+  ...tempoSilhuetasC5().map((t, k) => ({t, arquivo: SFX.clique, db: -16, onde: `Cena 5 · silhueta ${k + 1}`})),
+  ...tempoNomesC6().map((t, k) => ({t, arquivo: SFX.clique, db: -21, tom: [1, 1.06, 0.95, 1.12, 0.9, 1.03][k % 6], onde: `Cena 6 · nome ${k + 1}`})),
+  ...marcosC7().map((t, k) => ({t: t - 0.08, arquivo: SFX.whoosh, db: -17, onde: `Cena 7 · marco ${k + 1}`})),
+  {t: naBatida(inicioCena(7) + frasesCena(7)[1].ini) - ATAQUE_POWERUP, arquivo: SFX.powerup, db: -13, onde: 'Cena 8 · "Agora é fazer chegar"'},
 ];
 // arredonda um instante (global) para a batida (ou subdivisão) mais próxima
 export const naBatida = (t: number, sub = 1) => {
@@ -181,10 +176,10 @@ export const CENAS: Cena[] = [
   },
   {
     id: 'Cena06',
-    titulo: 'Vocês são a rede',
+    titulo: 'Juntos na mesma sala',
     duracao: 16,
     still: 15.2,
-    loc: 'E toda transmissão precisa de uma rede. Gestão de Pessoas. Inovação e Transformação. Comunicação Interna. Relacionamento com Agentes. Quatro frentes, uma mesma rede.',
+    loc: 'E é isso que vamos aprender juntos. Gestão de Pessoas. Inovação e Transformação. Comunicação Interna. Relacionamento com Agentes. Olhares diferentes, na mesma sala.',
   },
   {
     id: 'Cena07',

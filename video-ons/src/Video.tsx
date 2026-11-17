@@ -78,7 +78,8 @@ export const Video: React.FC<PropsVideo> = ({temLocucao, temTrilha, legendas}) =
       {temTrilha && <Audio src={staticFile(AUDIO.trilha)} volume={(f) => ducking(f / fps)} name="trilha" />}
       {SONS().map((s, i) => (
         <Sequence key={i} from={Math.max(0, quadros(s.t))} durationInFrames={s.dur ? quadros(s.dur) : undefined} layout="none" name={s.arquivo}>
-          <Audio src={staticFile(`sfx/${s.arquivo}`)} volume={(f) => db(s.db ?? AUDIO.sfxDb) * (s.dur ? Math.min(1, (quadros(s.dur) - f) / (s.dur > 2 ? quadros(s.dur) : 5)) : 1)} />
+          {/* rampa de 3 quadros (100 ms) na entrada: sem estalo */}
+          <Audio src={staticFile(`sfx/${s.arquivo}`)} toneFrequency={s.tom ?? 1} volume={(f) => db(s.db ?? AUDIO.sfxDb) * Math.min(1, (f + 1) / 3)} />
         </Sequence>
       ))}
       {temLocucao && <Audio src={staticFile(AUDIO.locucao)} />}

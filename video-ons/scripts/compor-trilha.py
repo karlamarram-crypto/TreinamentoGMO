@@ -165,6 +165,9 @@ def batidas(a, b, sub=1):
     return out
 
 
+# primeiro quadro: pad suave já soando (nada de silêncio no início)
+pad(0.0, ACORDES[0]['pad'], 1.2, 0.9, 700, ataque=0.06, rel=0.6)
+
 # Cenas 1-2: intro pulsante (baixo em colcheias, pad), entra kick suave e arpejo na Cena 2
 for t in batidas(1.0, C[2], 2):
     a = acorde(t)
@@ -180,29 +183,29 @@ for i, t in enumerate(batidas(C[1], C[2], 4)):
     pluck(t, acorde(t)['arp'][i % 4], 0.5, 2200)
 
 # Cena 3: groove; abafa na falha; quase silêncio no "Resultado?"
-for t in batidas(C[2], RESULT):
-    kick(t, 0.85)
+for t in batidas(C[2], C[3]):
+    kick(t, 0.85 if t < RESULT else 0.5)
 for t in batidas(C[2] + BAT / 2, RESULT):
     hat(t, 0.8)
 for t in batidas(C[2] + BAT, RESULT, 0.5):
     clap(t, 0.6)
-for t in batidas(C[2], RESULT, 2):
-    baixo(t, acorde(t)['baixo'], 0.22, 1.0, 1100)
+for t in batidas(C[2], C[3], 2):
+    baixo(t, acorde(t)['baixo'], 0.22, 1.0 if t < RESULT else 0.7, 1100)
 for i, t in enumerate(batidas(C[2], RESULT, 4)):
     pluck(t, acorde(t)['arp'][(i * 3) % 4], 0.65, 3000)
 for t in batidas(C[2], C[3], 1 / 4):
-    pad(t, acorde(t)['pad'], 4 * BAT, 0.6 if t < RESULT else 0.35, 1400)
+    pad(t, acorde(t)['pad'], 4 * BAT, 0.6 if t < RESULT else 0.9, 1400)
 
 # Cena 4: build (kick em semínimas, caixa acelerando, filtro abrindo); corte seco em CORTE
-for t in batidas(C[3], CORTE):
+for t in batidas(C[3], CORTE + 1.0):
     kick(t, 0.9)
-for t in batidas(C[3] + BAT / 2, CORTE):
+for t in batidas(C[3] + BAT / 2, CORTE + 1.0):
     hat(t, 0.9, aberto=True)
 for t in batidas(C[3], CORTE, 2):
     k = (t - C[3]) / (CORTE - C[3])
     baixo(t, acorde(t)['baixo'], 0.22, 1.0, 700 + 2500 * k)
-for i, t in enumerate(batidas(C[3], CORTE, 4)):
-    k = (t - C[3]) / (CORTE - C[3])
+for i, t in enumerate(batidas(C[3], CORTE + 1.0, 4)):
+    k = min(1, (t - C[3]) / (CORTE - C[3]))
     pluck(t, acorde(t)['arp'][i % 4], 0.6 + 0.4 * k, 1800 + 5000 * k)
 for t in batidas(CORTE - 4, CORTE - 2, 2):
     caixa(t, 0.55)
@@ -210,11 +213,15 @@ for t in batidas(CORTE - 2, CORTE - 1, 4):
     caixa(t, 0.7)
 for t in batidas(CORTE - 1, CORTE, 8):
     caixa(t, 0.85)
-for t in batidas(C[3], CORTE, 1 / 4):
+for t in batidas(C[3], CORTE + 1.0, 1 / 4):
     pad(t, acorde(t)['pad'], 4 * BAT, 0.7, 1600)
+for t in batidas(CORTE, CORTE + 1.0, 2):
+    baixo(t, acorde(t)['baixo'], 0.22, 0.9, 900)
 
 # Tensão (CORTE+SIL até o DROP): quase vazio, pad grave, batida de coração, swell no fim
-pad(CORTE + SIL, ['B2', 'F#3'], DROP - CORTE - SIL - 0.3, 0.6, 600, ataque=2.5, rel=0.3)
+pad(CORTE + 0.6, ['B2', 'F#3', 'D3'], DROP - CORTE - 0.8, 1.3, 800, ataque=0.6, rel=0.3)
+for t in batidas(CORTE + 1.0, DROP, 2):
+    baixo(t, 'B1', 0.2, 0.55 + 0.35 * (t - CORTE - 1.0) / (DROP - CORTE - 1.0), 450 + 600 * (t - CORTE - 1.0) / (DROP - CORTE - 1.0))
 for t in batidas(DROP - 4, DROP, 1):
     kick(t, 0.35)
 subida(DROP - 3.0, 3.0, 1.0)
@@ -250,6 +257,7 @@ FINAL = ['D3', 'A3', 'D4', 'F#4', 'A4']
 pad(CHEGAR, FINAL, 3.0, 1.6, 3000, ataque=0.02, rel=4.0)
 stab(CHEGAR, ['D4', 'F#4', 'A4'], 1.4, 1.5)
 baixo(CHEGAR, 'D2', 3.5, 1.0, 900)
+pad(CHEGAR + 2.5, ['D3', 'A3', 'F#4'], DUR - CHEGAR - 2.5, 0.9, 1400, ataque=1.5, rel=0.05)
 
 # ---------------- mix da trilha ----------------
 niveis = {'bateria': 1.0, 'baixo': 0.9, 'pad': 0.8, 'arp': 0.75, 'stab': 0.7, 'fx': 0.9}
@@ -266,34 +274,42 @@ for idx in np.array_split(np.arange(ini, fim), 120):
     if len(idx) == 0:
         continue
     tm = idx[0] / SR
-    fc = max(260, 9000 * np.exp(-(tm - FALHA) * 3.2))
+    fc = max(1100, 9000 * np.exp(-(tm - FALHA) * 3.2))
     b, a = butter(2, fc / (SR / 2))
     saida[idx], estado = lfilter(b, a, mix[idx], zi=estado)
-# quase silêncio no "Resultado?" e corte seco no fim do build
+# "Resultado?" e antes de "Nenhum projeto termina no go-live": a trilha CAI (~8 dB) e fica abafada,
+# mas nunca para. Nenhum trecho do vídeo fica em silêncio total.
 ganho = np.ones(N)
-ganho[(t >= RESULT) & (t < C[3])] = 0.25
-ganho[(t >= CORTE) & (t < CORTE + SIL)] = 0.0
-# dinâmica por seção: a intro respira, o build cresce, o drop é o ponto mais alto
 def rampa(a, b, g0, g1):
     m = (t >= a) & (t < b)
     ganho[m] *= g0 + (g1 - g0) * (t[m] - a) / (b - a)
+def queda(a, b, db=-8.0, rampa=0.12):
+    g = 10 ** (db / 20)
+    m = (t >= a) & (t < b)
+    ganho[m] = np.minimum(ganho[m], g)
+    for x0, x1, v0, v1 in ((a - rampa, a, 1, g), (b, b + rampa, g, 1)):
+        mm = (t >= x0) & (t < x1)
+        ganho[mm] = np.minimum(ganho[mm], v0 + (v1 - v0) * (t[mm] - x0) / rampa)
+queda(RESULT, C[3], -6.0)
+queda(CORTE, CORTE + 1.0)
+# passa-baixa também na queda antes da frase (cerca de 1 s)
+estado2 = lfilter_zi(b0, a0) * 0
+for idx in np.array_split(np.arange(int(CORTE * SR), int((CORTE + 1.0) * SR)), 40):
+    tm = idx[0] / SR
+    fc = 1100 + 8000 * max(0, (tm - (CORTE + 0.6)) / 0.4) ** 2
+    b, a = butter(2, fc / (SR / 2))
+    saida[idx], estado2 = lfilter(b, a, mix[idx], zi=estado2)
+# dinâmica por seção: a intro respira, o build cresce, o drop é o ponto mais alto
 rampa(0, C[1], 0.38, 0.45)
 rampa(C[1], C[2], 0.5, 0.58)
 rampa(C[2], C[3], 0.62, 0.62)
 rampa(C[3], CORTE, 0.55, 0.95)
-rampa(CORTE, DROP, 0.6, 0.6)
+rampa(CORTE + 1.0, DROP, 0.6, 0.75)
 rampa(DROP, C[6], 1.0, 1.0)
 rampa(C[6], C[7], 0.72, 0.72)
 rampa(C[7], DUR, 0.8, 0.8)
-# fade curto para não estalar nos cortes
-for corte in (CORTE,):
-    i = int(corte * SR)
-    ganho[i - 200:i] = np.linspace(1, 0, 200)
-# silêncio sob a cartela final: o acorde soa e some
-fim_musica = CHEGAR + 5.5
-ganho[t >= fim_musica] = 0
-j = int((fim_musica - 2.0) * SR)
-ganho[j:int(fim_musica * SR)] *= np.linspace(1, 0, int(fim_musica * SR) - j)
+# sob a cartela final: o acorde segue baixinho até o último quadro (sem silêncio)
+rampa(CHEGAR + 3.0, DUR, 1.0, 0.35)
 saida *= ganho
 
 # estéreo simples (pad e arpejo abertos)

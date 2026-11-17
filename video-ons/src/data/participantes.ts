@@ -1,25 +1,25 @@
 // Lista de participantes. Os nomes na tela vêm só daqui (sem e-mails).
-// O layout da Cena 6 se adapta ao número de nomes e de frentes.
-export type Participante = {nome: string; frente: string};
+// O layout da Cena 6 se adapta ao número de nomes e de áreas.
+export type Participante = {nome: string; area: string};
 
 export const participantes: Participante[] = [
-  {nome: 'Flavia Babo', frente: 'Gestão de Pessoas'},
-  {nome: 'Luna Almeida', frente: 'Gestão de Pessoas'},
-  {nome: 'Marcelo Ferreira', frente: 'Gestão de Pessoas'},
-  {nome: 'Ana Costa', frente: 'Gestão de Pessoas'},
-  {nome: 'Ana Zuzarte', frente: 'Gestão de Pessoas'},
-  {nome: 'Danielli Iglesias', frente: 'Gestão de Pessoas'},
-  {nome: 'Isabella Reis', frente: 'Gestão de Pessoas'},
-  {nome: 'Ludimila Dantas', frente: 'Inovação e Transformação'},
-  {nome: 'Pamella Medea', frente: 'Inovação e Transformação'},
-  {nome: 'Alex do Amaral', frente: 'Comunicação Interna'},
-  {nome: 'Ana Patricia Paiva', frente: 'Comunicação Interna'},
-  {nome: 'Taianne Rosaly', frente: 'Relacionamento com Agentes'},
-  {nome: 'Gabriel Lobo', frente: 'Relacionamento com Agentes'},
-  {nome: 'Fatima Giseli', frente: 'Relacionamento com Agentes'},
-  {nome: 'Elisabete Gomes', frente: 'Relacionamento com Agentes'},
-  {nome: 'Marcella Lanzetti', frente: 'Relacionamento com Agentes'},
+  {nome: 'Flavia Babo', area: 'Gestão de Pessoas'},
+  {nome: 'Luna Almeida', area: 'Gestão de Pessoas'},
+  {nome: 'Marcelo Ferreira', area: 'Gestão de Pessoas'},
+  {nome: 'Ana Costa', area: 'Gestão de Pessoas'},
+  {nome: 'Ana Zuzarte', area: 'Gestão de Pessoas'},
+  {nome: 'Danielli Iglesias', area: 'Gestão de Pessoas'},
+  {nome: 'Isabella Reis', area: 'Gestão de Pessoas'},
+  {nome: 'Ludimila Dantas', area: 'Inovação e Transformação'},
+  {nome: 'Pamella Medea', area: 'Inovação e Transformação'},
+  {nome: 'Alex do Amaral', area: 'Comunicação Interna'},
+  {nome: 'Ana Patricia Paiva', area: 'Comunicação Interna'},
+  {nome: 'Taianne Rosaly', area: 'Relacionamento com Agentes'},
+  {nome: 'Gabriel Lobo', area: 'Relacionamento com Agentes'},
+  {nome: 'Fatima Giseli', area: 'Relacionamento com Agentes'},
+  {nome: 'Elisabete Gomes', area: 'Relacionamento com Agentes'},
+  {nome: 'Marcella Lanzetti', area: 'Relacionamento com Agentes'},
 ];
 
-// Frentes na ordem em que aparecem na lista
-export const frentes = (): string[] => [...new Set(participantes.map((p) => p.frente))];
+// Áreas na ordem em que aparecem na lista
+export const areas = (): string[] => [...new Set(participantes.map((p) => p.area))];
