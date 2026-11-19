@@ -1,0 +1,21 @@
+{
+  "voz_id": "PznTnBc8X6pvixs9UkQm",
+  "modelo": "eleven_multilingual_v2",
+  "voice_settings": { "stability": 0.5, "similarity_boost": 0.75, "style": 0.15, "use_speaker_boost": true },
+  "cenas": [
+    { "id": "cena1", "titulo": "Gancho",
+      "texto": "Uma mudança foi decidida. A pergunta é: quem ficou sabendo primeiro?" },
+    { "id": "cena2", "titulo": "Rádio corredor",
+      "texto": "Quase sempre, não foi pela liderança. Foi pelo corredor. Um comentário aqui, uma suposição ali, e quando o comunicado oficial chega, as pessoas já têm a sua própria versão da história. Quando a comunicação não chega, o boato chega antes." },
+    { "id": "cena3", "titulo": "Comunicar não é informar",
+      "texto": "E comunicar não é só informar. Um e-mail enviado não é uma mensagem entendida. Comunicar é fazer cada pessoa entender por que estamos mudando, o que muda para ela e o que se espera dela." },
+    { "id": "cena4", "titulo": "O que as pessoas querem saber",
+      "texto": "Diante de qualquer mudança, as pessoas querem respostas para quatro perguntas. Por que estamos mudando? O que muda para mim? O que esperam de mim? E onde tiro minhas dúvidas? Se a mensagem não responde a isso, ela ainda não está pronta." },
+    { "id": "cena5", "titulo": "Quem fala importa",
+      "texto": "E quem fala importa. O porquê precisa vir da liderança. O impacto no dia a dia, do gestor direto, que é em quem as pessoas mais confiam. Mensagem certa pelo remetente errado perde credibilidade." },
+    { "id": "cena6", "titulo": "Princípios",
+      "texto": "Por isso, alguns princípios não mudam: uma só narrativa, repetida de cinco a sete vezes, em canais diferentes. Sempre com espaço para ouvir. E o que é sensível se diz face a face: ninguém deveria saber da própria mudança por terceiros." },
+    { "id": "cena7", "titulo": "Fechamento",
+      "texto": "Uma orquestra afinada toca a mesma partitura. Uma mudança bem comunicada conta a mesma história. É isso que vamos construir agora." }
+  ]
+}
